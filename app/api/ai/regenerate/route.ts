@@ -44,6 +44,7 @@ export async function POST(request: NextRequest) {
       documentType = body.documentType;
       consultationData = body.consultationData;
       language = body.language || 'de';
+      const doctorName: string = body.doctorName || '';
       
       // Convert current document to text
       text = documentToText(body.currentDocument.content);
@@ -121,15 +122,16 @@ Return the answer as JSON with the following fields:
   "diagnosis": "Diagnosis/findings in understandable language",
   "treatment": "Treatment performed or planned",
   "recommendations": "Recommendations for the patient",
-  "closing": "Closing with contact information",
+  "closing": "Closing with contact information (e.g. 'Best regards,' - DO NOT include doctor name here)",
   "date": "Current date (Format: MM/DD/YYYY)"
 }`;
             userPrompt = `Patient: ${patientName}
 Complaint: ${complaint}
 Symptoms: ${symptoms}
 Diagnosis/Assessment: ${diagnosis}
+${doctorName ? `Doctor's name: ${doctorName}` : ''}
 
-${doctorInstructions}${varietyNote}`;
+${doctorInstructions}${varietyNote}${doctorName ? ` IMPORTANT: Use the doctor's name "${doctorName}" in the doctorName field, do NOT invent a different name.` : ''}`;
             break;
           case 'referralReason':
             systemPrompt = `You are a medical assistant who writes referral reasons.
@@ -146,14 +148,17 @@ Return the answer as JSON with the following fields:
   "date": "Current date (Format: MM/DD/YYYY)",
   "diagnosis": "Diagnosis/Clinical question",
   "requestedAction": "Requested action",
-  "anamneseAndFindings": "Anamnesis and findings"
+  "anamneseAndFindings": "Anamnesis and findings",
+  "doctorName": "Doctor's name",
+  "doctorTitle": "Doctor's title (e.g. Dr.)"
 }`;
             userPrompt = `Patient: ${patientName}
 Complaint: ${complaint}
 Symptoms: ${symptoms}
 Diagnosis/Assessment: ${diagnosis}
+${doctorName ? `Doctor's name: ${doctorName}` : ''}
 
-${doctorInstructions}${varietyNote}`;
+${doctorInstructions}${varietyNote}${doctorName ? ` IMPORTANT: Use the doctor's name "${doctorName}" in the doctorName field, do NOT invent a different name.` : ''}`;
             break;
           case 'referralResponse':
             systemPrompt = `You are a medical assistant who writes referral responses.
@@ -178,8 +183,9 @@ Return the answer as JSON with the following fields:
 Complaint: ${complaint}
 Symptoms: ${symptoms}
 Diagnosis/Assessment: ${diagnosis}
+${doctorName ? `Doctor's name: ${doctorName}` : ''}
 
-${doctorInstructions}${varietyNote}`;
+${doctorInstructions}${varietyNote}${doctorName ? ` IMPORTANT: Use the doctor's name "${doctorName}" in the doctorName field, do NOT invent a different name.` : ''}`;
             break;
         }
       } else {
@@ -201,15 +207,16 @@ Gib die Antwort als JSON mit folgenden Feldern:
   "diagnosis": "Diagnose/Befund in verständlicher Sprache",
   "treatment": "Durchgeführte oder geplante Behandlung",
   "recommendations": "Empfehlungen für den Patienten",
-  "closing": "Abschluss mit Kontaktmöglichkeit",
+  "closing": "Abschluss mit Kontaktmöglichkeit (z.B. 'Mit freundlichen Grüßen,' - DOKTOR ISMI BURAYA EKLEME)",
   "date": "Aktuelles Datum (Format: DD.MM.YYYY)"
 }`;
             userPrompt = `Patient: ${patientName}
 Beschwerde: ${complaint}
 Symptome: ${symptoms}
 Diagnose/Beurteilung: ${diagnosis}
+${doctorName ? `Name des Arztes: ${doctorName}` : ''}
 
-${doctorInstructions}${varietyNote}`;
+${doctorInstructions}${varietyNote}${doctorName ? ` WICHTIG: Verwende den Arztnamen "${doctorName}" im doctorName-Feld, erfinde KEINEN anderen Namen.` : ''}`;
             break;
           case 'referralReason':
             systemPrompt = `Du bist ein medizinischer Assistent, der Überweisungsgründe verfasst.
@@ -226,14 +233,17 @@ Gib die Antwort als JSON mit folgenden Feldern:
   "date": "Aktuelles Datum (Format: DD.MM.YYYY)",
   "diagnosis": "Diagnose/Klinische Fragestellung",
   "requestedAction": "Erbetene Maßnahme",
-  "anamneseAndFindings": "Anamnese und Befunde"
+  "anamneseAndFindings": "Anamnese und Befunde",
+  "doctorName": "Name des Arztes",
+  "doctorTitle": "Titel des Arztes (z.B. Dr. med.)"
 }`;
             userPrompt = `Patient: ${patientName}
 Beschwerde: ${complaint}
 Symptome: ${symptoms}
 Diagnose/Beurteilung: ${diagnosis}
+${doctorName ? `Name des Arztes: ${doctorName}` : ''}
 
-${doctorInstructions}${varietyNote}`;
+${doctorInstructions}${varietyNote}${doctorName ? ` WICHTIG: Verwende den Arztnamen "${doctorName}" im doctorName-Feld, erfinde KEINEN anderen Namen.` : ''}`;
             break;
           case 'referralResponse':
             systemPrompt = `Du bist ein medizinischer Assistent, der Überweisungsantworten verfasst.
@@ -258,8 +268,9 @@ Gib die Antwort als JSON mit folgenden Feldern:
 Beschwerde: ${complaint}
 Symptome: ${symptoms}
 Diagnose/Beurteilung: ${diagnosis}
+${doctorName ? `Name des Arztes: ${doctorName}` : ''}
 
-${doctorInstructions}${varietyNote}`;
+${doctorInstructions}${varietyNote}${doctorName ? ` WICHTIG: Verwende den Arztnamen "${doctorName}" im doctorName-Feld, erfinde KEINEN anderen Namen.` : ''}`;
             break;
         }
       }
@@ -293,6 +304,37 @@ ${doctorInstructions}${varietyNote}`;
       }
 
       const document = JSON.parse(responseContent);
+      
+      // Add doctor name and title if provided
+      const dateLocale = language === 'en' ? 'en-US' : 'de-DE';
+      const dateFormat: Intl.DateTimeFormatOptions | undefined = language === 'en' 
+        ? { month: '2-digit', day: '2-digit', year: 'numeric' as const } 
+        : undefined;
+      const currentDate = dateFormat
+        ? new Date().toLocaleDateString(dateLocale, dateFormat)
+        : new Date().toLocaleDateString(dateLocale);
+      
+      if (documentType === 'patientMessage' || documentType === 'referralResponse') {
+        if (!document.date) document.date = currentDate;
+        // Doktor ismini ekle veya düzelt (eğer AI farklı bir isim eklemişse)
+        if (doctorName) {
+          if (!document.doctorName || document.doctorName !== doctorName) {
+            document.doctorName = doctorName;
+          }
+        }
+        if (!document.doctorTitle) document.doctorTitle = language === 'en' ? 'Dr.' : 'Dr. med.';
+      }
+      if (documentType === 'referralReason') {
+        if (!document.date) document.date = currentDate;
+        // ReferralReason için de doktor ismini ekle veya düzelt
+        if (doctorName) {
+          if (!document.doctorName || document.doctorName !== doctorName) {
+            document.doctorName = doctorName;
+          }
+        }
+        if (!document.doctorTitle) document.doctorTitle = language === 'en' ? 'Dr.' : 'Dr. med.';
+      }
+      
       return NextResponse.json({ 
         document,
         rewrittenText: documentToText(document),

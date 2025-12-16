@@ -4,6 +4,7 @@ import React, { useState, useEffect, memo } from "react";
 import { Mic, Copy, X, Plus } from "lucide-react";
 import { useTheme } from "@/lib/ThemeContext";
 import { useToast } from "@/lib/ToastContext";
+import { useLanguage } from "@/lib/LanguageContext";
 
 interface SOAPNoteProps {
   initialValues?: {
@@ -175,6 +176,7 @@ function SOAPNote({
   );
   const { themeId } = useTheme();
   const { showSuccess } = useToast();
+  const { t } = useLanguage();
   const isDark = themeId === "dark";
 
   const [values, setValues] = useState({
@@ -228,7 +230,7 @@ function SOAPNote({
         <Section
           label="Anamnese"
           value={values.anamnese}
-          placeholder="Hastanın öyküsü..."
+          placeholder={t("soap.anamnesePlaceholder")}
           onChange={(value) => handleValueChange("anamnese", value)}
           onDelete={() => handleDelete("anamnese")}
           onAdd={() => handleAdd("anamnese")}
@@ -241,7 +243,7 @@ function SOAPNote({
         <Section
           label="Untersuchung"
           value={values.untersuchung}
-          placeholder="Muayene bulguları..."
+          placeholder={t("soap.untersuchungPlaceholder")}
           onChange={(value) => handleValueChange("untersuchung", value)}
           onDelete={() => handleDelete("untersuchung")}
           onAdd={() => handleAdd("untersuchung")}
@@ -254,7 +256,7 @@ function SOAPNote({
         <Section
           label="Beurteilung & Plan"
           value={values.beurteilungPlan}
-          placeholder="Tedavi planı..."
+          placeholder={t("soap.beurteilungPlanShortPlaceholder")}
           onChange={(value) => handleValueChange("beurteilungPlan", value)}
           onDelete={() => handleDelete("beurteilungPlan")}
           onAdd={() => handleAdd("beurteilungPlan")}
@@ -273,7 +275,7 @@ function SOAPNote({
       <Section
         label="Kontaktgrund"
         value={values.kontaktgrund}
-        placeholder="İletişim nedeni..."
+        placeholder={t("soap.kontaktgrundPlaceholder")}
         onChange={(value) => handleValueChange("kontaktgrund", value)}
         onDelete={() => handleDelete("kontaktgrund")}
         onAdd={() => handleAdd("kontaktgrund")}
@@ -286,7 +288,7 @@ function SOAPNote({
       <Section
         label="Aktueller Zustand"
         value={values.aktuellerZustand}
-        placeholder="Şu anki durum..."
+        placeholder={t("soap.aktuellerZustandPlaceholder")}
         onChange={(value) => handleValueChange("aktuellerZustand", value)}
         onDelete={() => handleDelete("aktueller_zustand")}
         onAdd={() => handleAdd("aktueller_zustand")}
@@ -299,7 +301,7 @@ function SOAPNote({
       <Section
         label="Subjektiv"
         value={values.subjektiv}
-        placeholder="Hastanın şikayetleri..."
+        placeholder={t("soap.subjektivPlaceholder")}
         onChange={(value) => handleValueChange("subjektiv", value)}
         onDelete={() => handleDelete("subjektiv")}
         onAdd={() => handleAdd("subjektiv")}
@@ -312,7 +314,7 @@ function SOAPNote({
       <Section
         label="Objektiv"
         value={values.objektiv}
-        placeholder="Objektif bulgular..."
+        placeholder={t("soap.objektivPlaceholder")}
         onChange={(value) => handleValueChange("objektiv", value)}
         onDelete={() => handleDelete("objektiv")}
         onAdd={() => handleAdd("objektiv")}
@@ -325,7 +327,7 @@ function SOAPNote({
       <Section
         label="Beurteilung & Plan"
         value={values.beurteilungPlan}
-        placeholder="Değerlendirme ve plan..."
+        placeholder={t("soap.beurteilungPlanPlaceholder")}
         onChange={(value) => handleValueChange("beurteilungPlan", value)}
         onDelete={() => handleDelete("beurteilungPlan")}
         onAdd={() => handleAdd("beurteilungPlan")}

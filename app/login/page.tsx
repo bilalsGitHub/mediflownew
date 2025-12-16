@@ -71,7 +71,7 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 className="w-full px-4 py-2 border border-theme-border rounded-lg focus:outline-none focus:ring-2 focus:ring-theme-primary bg-theme-card text-theme-text"
-                placeholder="doctor@example.com"
+                placeholder={t("auth.emailPlaceholder")}
               />
             </div>
 
@@ -86,7 +86,7 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 className="w-full px-4 py-2 border border-theme-border rounded-lg focus:outline-none focus:ring-2 focus:ring-theme-primary bg-theme-card text-theme-text"
-                placeholder="••••••••"
+                placeholder={t("auth.passwordPlaceholder")}
               />
             </div>
 

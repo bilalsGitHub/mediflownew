@@ -4,21 +4,55 @@ import { openai } from '@/lib/openai/client';
 function getTemplatePrompts(language: 'de' | 'en' = 'de'): Record<string, string> {
   if (language === 'en') {
     return {
-      dokumentation: `Analyze the following consultation transcript and divide it into these sections:
-- Subjektiv: Patient's complaints and subjective findings
-- Objektiv: Objective findings and examination results
-- Beurteilung & Plan: Assessment and treatment plan
+      dokumentation: `Convert the following raw doctor–patient conversation into a structured clinical note in English.
+
+OUTPUT FORMAT (exactly this structure):
+
+Kontaktgrund:
+[short medical reason for encounter]
+
+Aktueller Zustand:
+[general condition of the patient]
+
+Subjektiv:
+[patient-reported symptoms, location, trigger, duration, measures taken, response]
+
+Objektiv:
+[objective findings; if none, state neutral or negative findings]
+
+Beurteilung & Plan:
+[clinical assessment, suspected diagnosis, and treatment/plan]
+
+INPUT CONVERSATION:
+<<<
+[PASTE DOCTOR–PATIENT CONVERSATION HERE]
+>>>
 
 Return in JSON format:
 {
+  "kontaktgrund": "...",
+  "aktueller_zustand": "...",
   "subjektiv": "...",
   "objektiv": "...",
   "beurteilung_plan": "..."
 }`,
-      kurzdokumentation: `Analyze the following consultation transcript and divide it into these sections:
-- Anamnese: Patient's history and complaints
-- Untersuchung: Examination findings
-- Beurteilung & Plan: Assessment and treatment plan
+      kurzdokumentation: `Convert the following raw doctor–patient conversation into a structured clinical note in English.
+
+OUTPUT FORMAT (exactly this structure):
+
+Anamnese:
+[patient-reported history and complaints, in medical language]
+
+Untersuchung:
+[examination findings; if none, state unremarkable findings]
+
+Beurteilung & Plan:
+[clinical assessment, suspected diagnosis, and treatment/plan]
+
+INPUT CONVERSATION:
+<<<
+[PASTE DOCTOR–PATIENT CONVERSATION HERE]
+>>>
 
 Return in JSON format:
 {
@@ -26,10 +60,23 @@ Return in JSON format:
   "untersuchung": "...",
   "beurteilung_plan": "..."
 }`,
-      standard: `Analyze the following consultation transcript and divide it into these sections:
-- Subjektiv: Patient's complaints and subjective findings
-- Objektiv: Objective findings and examination results
-- Beurteilung & Plan: Assessment and treatment plan
+      standard: `Convert the following raw doctor–patient conversation into a structured clinical note in English.
+
+OUTPUT FORMAT (exactly this structure):
+
+Subjektiv:
+[patient-reported symptoms, location, trigger, duration, measures taken, response]
+
+Objektiv:
+[objective findings; if none, state neutral or negative findings]
+
+Beurteilung & Plan:
+[clinical assessment, suspected diagnosis, and treatment/plan]
+
+INPUT CONVERSATION:
+<<<
+[PASTE DOCTOR–PATIENT CONVERSATION HERE]
+>>>
 
 Return in JSON format:
 {
@@ -42,21 +89,55 @@ Return in JSON format:
   
   // German (default)
   return {
-    dokumentation: `Analysiere das folgende Konsultationstranskript und teile es in diese Abschnitte ein:
-- Subjektiv: Beschwerden des Patienten und subjektive Befunde
-- Objektiv: Objektive Befunde und Untersuchungsergebnisse
-- Beurteilung & Plan: Beurteilung und Behandlungsplan
+    dokumentation: `Konvertiere das folgende Arzt-Patienten-Gespräch in eine strukturierte klinische Notiz auf Deutsch.
+
+OUTPUT FORMAT (genau diese Struktur):
+
+Kontaktgrund:
+[Kurzer medizinischer Grund für die Konsultation]
+
+Aktueller Zustand:
+[Allgemeinzustand des Patienten]
+
+Subjektiv:
+[Vom Patienten berichtete Symptome, Lokalisation, Auslöser, Dauer, ergriffene Maßnahmen, Reaktion]
+
+Objektiv:
+[Objektive Befunde; wenn keine gegeben, stelle unauffällige Befunde fest]
+
+Beurteilung & Plan:
+[Klinische Beurteilung, Verdachtsdiagnose und Behandlung/Plan]
+
+INPUT CONVERSATION:
+<<<
+[HIER DAS ARZT-PATIENTEN-GESPRÄCH EINFÜGEN]
+>>>
 
 Gib die Antwort als JSON zurück:
 {
+  "kontaktgrund": "...",
+  "aktueller_zustand": "...",
   "subjektiv": "...",
   "objektiv": "...",
   "beurteilung_plan": "..."
 }`,
-    kurzdokumentation: `Analysiere das folgende Konsultationstranskript und teile es in diese Abschnitte ein:
-- Anamnese: Anamnese und Beschwerden des Patienten
-- Untersuchung: Untersuchungsbefunde
-- Beurteilung & Plan: Beurteilung und Behandlungsplan
+    kurzdokumentation: `Konvertiere das folgende Arzt-Patienten-Gespräch in eine strukturierte klinische Notiz auf Deutsch.
+
+OUTPUT FORMAT (genau diese Struktur):
+
+Anamnese:
+[Vom Patienten berichtete Anamnese und Beschwerden, in medizinischer Sprache]
+
+Untersuchung:
+[Untersuchungsbefunde; wenn keine gegeben, stelle unauffällige Befunde fest]
+
+Beurteilung & Plan:
+[Klinische Beurteilung, Verdachtsdiagnose und Behandlung/Plan]
+
+INPUT CONVERSATION:
+<<<
+[HIER DAS ARZT-PATIENTEN-GESPRÄCH EINFÜGEN]
+>>>
 
 Gib die Antwort als JSON zurück:
 {
@@ -64,10 +145,23 @@ Gib die Antwort als JSON zurück:
   "untersuchung": "...",
   "beurteilung_plan": "..."
 }`,
-    standard: `Analysiere das folgende Konsultationstranskript und teile es in diese Abschnitte ein:
-- Subjektiv: Beschwerden des Patienten und subjektive Befunde
-- Objektiv: Objektive Befunde und Untersuchungsergebnisse
-- Beurteilung & Plan: Beurteilung und Behandlungsplan
+    standard: `Konvertiere das folgende Arzt-Patienten-Gespräch in eine strukturierte klinische Notiz auf Deutsch.
+
+OUTPUT FORMAT (genau diese Struktur):
+
+Subjektiv:
+[Vom Patienten berichtete Symptome, Lokalisation, Auslöser, Dauer, ergriffene Maßnahmen, Reaktion]
+
+Objektiv:
+[Objektive Befunde; wenn keine gegeben, stelle unauffällige Befunde fest]
+
+Beurteilung & Plan:
+[Klinische Beurteilung, Verdachtsdiagnose und Behandlung/Plan]
+
+INPUT CONVERSATION:
+<<<
+[HIER DAS ARZT-PATIENTEN-GESPRÄCH EINFÜGEN]
+>>>
 
 Gib die Antwort als JSON zurück:
 {
@@ -80,28 +174,40 @@ Gib die Antwort als JSON zurück:
 
 function getSystemPrompt(language: 'de' | 'en' = 'de'): string {
   if (language === 'en') {
-    return `You are a medical note editing assistant. Your task is to rewrite existing medical note content according to a new template format.
+    return `You are a medical documentation assistant.
 
-CRITICAL RULES:
-1. NEVER make medical comments, diagnoses, or treatment recommendations
-2. Preserve ALL clinical information from the existing note - do not lose or add any information
-3. Only change the structure, sectioning, and expression style according to the new template
-4. Clinical meaning and content must remain the same, only the presentation format should change
-5. Fill every section, do not leave empty
-6. Return in JSON format
-7. You can write in English or German, preserve the language of the existing note`;
+Your task is to convert a raw doctor–patient conversation into a structured clinical note in English.
+
+IMPORTANT RULES:
+- Write in formal medical language (not patient speech).
+- Do NOT quote the patient directly.
+- Summarize clearly and objectively.
+- Do not invent findings that are not mentioned.
+- If no objective findings are given, state neutral or negative findings.
+- Keep each section concise and clinically appropriate.
+- Write from the doctor's clinical perspective, not the patient's perspective.
+- Use medical terminology.
+- Avoid repetition between sections.
+
+Return in JSON format.`;
   }
   
-  return `Du bist ein medizinischer Notizenbearbeitungsassistent. Deine Aufgabe ist es, bestehenden medizinischen Notizeninhalt nach einem neuen Template-Format neu zu schreiben.
+  return `Du bist ein medizinischer Dokumentationsassistent.
 
-KRITISCHE REGELN:
-1. NIEMALS medizinische Kommentare, Diagnosen oder Behandlungsempfehlungen geben
-2. ALLE klinischen Informationen aus der bestehenden Notiz beibehalten - keine Informationen verlieren oder hinzufügen
-3. Nur die Struktur, Abschnittung und Ausdrucksweise nach dem neuen Template ändern
-4. Klinische Bedeutung und Inhalt müssen gleich bleiben, nur das Präsentationsformat sollte sich ändern
-5. Jeden Abschnitt ausfüllen, nichts leer lassen
-6. Als JSON zurückgeben
-7. Du kannst auf Deutsch oder Englisch schreiben, die Sprache der bestehenden Notiz beibehalten`;
+Deine Aufgabe ist es, ein rohes Arzt-Patienten-Gespräch in eine strukturierte klinische Notiz auf Deutsch umzuwandeln.
+
+WICHTIGE REGELN:
+- Schreibe in formaler medizinischer Sprache (nicht in Patientensprache).
+- Zitiere den Patienten NICHT direkt.
+- Fasse klar und objektiv zusammen.
+- Erfinde keine Befunde, die nicht erwähnt wurden.
+- Wenn keine objektiven Befunde gegeben sind, stelle neutrale oder negative Befunde fest.
+- Halte jeden Abschnitt kurz und klinisch angemessen.
+- Schreibe aus der klinischen Perspektive des Arztes, nicht aus der Perspektive des Patienten.
+- Verwende medizinische Terminologie.
+- Vermeide Wiederholungen zwischen den Abschnitten.
+
+Gib die Antwort als JSON zurück.`;
 }
 
 export async function POST(request: NextRequest) {
@@ -136,14 +242,19 @@ export async function POST(request: NextRequest) {
         sourceContent = `Bestehende medizinische Notiz:\n${existingNote}\n\nOriginales Konsultationstranskript (als Referenz):\n${transcript}`;
       }
     } else {
+      // Use the new format with <<< >>> markers
       sourceContent = validLanguage === 'en' 
-        ? `Consultation Transcript:\n${transcript}`
-        : `Konsultationstranskript:\n${transcript}`;
+        ? `<<<\n${transcript}\n>>>`
+        : `<<<\n${transcript}\n>>>`;
     }
 
     const importantNote = validLanguage === 'en'
-      ? '\n\nIMPORTANT: Preserve all clinical information from the existing note, rewrite according to the new template format. Do not lose any information or add new information.'
-      : '\n\nWICHTIG: Behalte alle klinischen Informationen aus der bestehenden Notiz bei, schreibe sie nach dem neuen Template-Format neu. Keine Informationen verlieren oder neue Informationen hinzufügen.';
+      ? existingNote && existingNote.trim().length > 0
+        ? '\n\nIMPORTANT: Preserve all clinical information from the existing note, rewrite according to the new template format. Do not lose any information or add new information.'
+        : ''
+      : existingNote && existingNote.trim().length > 0
+        ? '\n\nWICHTIG: Behalte alle klinischen Informationen aus der bestehenden Notiz bei, schreibe sie nach dem neuen Template-Format neu. Keine Informationen verlieren oder neue Informationen hinzufügen.'
+        : '';
 
     const userPrompt = `${TEMPLATE_PROMPTS[template]}\n\n${sourceContent}${importantNote}`;
 
@@ -170,8 +281,11 @@ export async function POST(request: NextRequest) {
     try {
       const parsed = JSON.parse(responseText);
       
-      // Field name'leri normalize et (beurteilung_plan -> beurteilungPlan)
+      // Field name'leri normalize et (beurteilung_plan -> beurteilungPlan, aktueller_zustand -> aktuellerZustand)
       const normalized: any = {};
+      if (parsed.kontaktgrund) normalized.kontaktgrund = parsed.kontaktgrund;
+      if (parsed.aktueller_zustand) normalized.aktuellerZustand = parsed.aktueller_zustand;
+      if (parsed.aktuellerZustand) normalized.aktuellerZustand = parsed.aktuellerZustand;
       if (parsed.subjektiv) normalized.subjektiv = parsed.subjektiv;
       if (parsed.objektiv) normalized.objektiv = parsed.objektiv;
       if (parsed.anamnese) normalized.anamnese = parsed.anamnese;

@@ -10,6 +10,7 @@ import {
   Clock,
   Loader2,
   Trash2,
+  RefreshCw,
 } from "lucide-react";
 import { storage, Consultation } from "@/lib/storage";
 import AnalysisDisplay from "@/components/AnalysisDisplay";
@@ -107,6 +108,7 @@ export default function ConsultationDetailPage() {
     currentText?: string;
   }>({ type: null });
   const [isRegenerating, setIsRegenerating] = useState(false);
+  const [isReanalyzing, setIsReanalyzing] = useState(false);
   const [isTemplateChanging, setIsTemplateChanging] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
@@ -636,6 +638,69 @@ export default function ConsultationDetailPage() {
       );
     } finally {
       setIsRegenerating(false);
+    }
+  };
+
+  const handleReanalyze = async () => {
+    const currentConsultation = consultation || previousConsultationRef.current;
+    if (!currentConsultation || !currentConsultation.transcript) {
+      showError("Transkript bulunamadı");
+      return;
+    }
+
+    setIsReanalyzing(true);
+    try {
+      const response = await fetch("/api/ai/analyze-with-template", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          transcript: currentConsultation.transcript,
+          template: selectedTemplate,
+          language: language,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Analiz başarısız oldu");
+      }
+
+      const { soapNote: newSoapNote } = await response.json();
+
+      // Yeni SOAP note'u güncelle
+      const updatedSoapNote = {
+        subjektiv: newSoapNote.subjektiv || "",
+        objektiv: newSoapNote.objektiv || "",
+        beurteilungPlan: newSoapNote.beurteilungPlan || "",
+        anamnese: newSoapNote.anamnese || "",
+        untersuchung: newSoapNote.untersuchung || "",
+      };
+
+      const updatedAnamnese = {
+        kontaktgrund: newSoapNote.kontaktgrund || "",
+        aktueller_zustand: newSoapNote.aktueller_zustand || newSoapNote.aktuellerZustand || "",
+      };
+
+      soapNoteRef.current = updatedSoapNote;
+      setSoapNote(updatedSoapNote);
+
+      // Consultation'ı güncelle
+      const updated = {
+        ...currentConsultation,
+        soapNote: updatedSoapNote,
+        anamnese: updatedAnamnese,
+        updatedAt: new Date().toISOString(),
+      };
+      await storage.save(updated);
+      setConsultation(updated);
+
+      showSuccess("Not başarıyla güncellendi!");
+    } catch (error: any) {
+      console.error("Reanalyze error:", error);
+      showError("Analiz sırasında bir hata oluştu: " + error.message);
+    } finally {
+      setIsReanalyzing(false);
     }
   };
 
@@ -1196,6 +1261,25 @@ export default function ConsultationDetailPage() {
 
           {activeTab === "note" && (
             <div className="space-y-6">
+              {/* Reanalyze Button */}
+              <div className="flex justify-end px-6">
+                <button
+                  onClick={handleReanalyze}
+                  disabled={isReanalyzing}
+                  className="flex items-center gap-2 px-4 py-2 bg-theme-primary text-white rounded-lg hover:bg-theme-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                  {isReanalyzing ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Analiz ediliyor...</span>
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw className="w-4 h-4" />
+                      <span>Güncelle</span>
+                    </>
+                  )}
+                </button>
+              </div>
               <SOAPNote
                 initialValues={soapNoteInitialValues}
                 onSave={async (values) => {

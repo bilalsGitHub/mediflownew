@@ -10,7 +10,7 @@ import Tabs from "@/components/Tabs";
 import MainLayout from "@/components/layout/MainLayout";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { storage, Consultation } from "@/lib/storage";
-import { Loader2, FileText, MessageSquare, ClipboardList } from "lucide-react";
+import { Loader2, FileText, MessageSquare, ClipboardList, RefreshCw } from "lucide-react";
 import StatusBadge from "@/components/StatusBadge";
 import SOAPNote from "@/components/SOAPNote";
 import AnamneseSection from "@/components/AnamneseSection";
@@ -66,6 +66,7 @@ export default function NewConsultationPage() {
     currentText?: string;
   }>({ type: null });
   const [isRegenerating, setIsRegenerating] = useState(false);
+  const [isReanalyzing, setIsReanalyzing] = useState(false);
   const [isTemplateChanging, setIsTemplateChanging] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
@@ -456,6 +457,69 @@ export default function NewConsultationPage() {
       showError("Regenerate sırasında bir hata oluştu: " + error.message);
     } finally {
       setIsRegenerating(false);
+    }
+  };
+
+  const handleReanalyzeNote = async () => {
+    if (!transcript || transcript.trim().length === 0) {
+      showError(t("consultation.reanalyzeError") || "Transkript bulunamadı");
+      return;
+    }
+
+    setIsReanalyzing(true);
+    try {
+      const response = await fetch("/api/ai/analyze-with-template", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          transcript: transcript,
+          template: selectedTemplate,
+          language: language,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(t("consultation.reanalyzeError") || "Analiz başarısız oldu");
+      }
+
+      const { soapNote: newSoapNote } = await response.json();
+
+      // Yeni SOAP note'u güncelle
+      const updatedSoapNote = {
+        subjektiv: newSoapNote.subjektiv || "",
+        objektiv: newSoapNote.objektiv || "",
+        beurteilungPlan: newSoapNote.beurteilungPlan || "",
+        anamnese: newSoapNote.anamnese || "",
+        untersuchung: newSoapNote.untersuchung || "",
+      };
+
+      const updatedAnamnese = {
+        kontaktgrund: newSoapNote.kontaktgrund || "",
+        aktuellerZustand: newSoapNote.aktueller_zustand || newSoapNote.aktuellerZustand || "",
+      };
+
+      setSoapNote(updatedSoapNote);
+      setAnamnese(updatedAnamnese);
+
+      // Consultation'a kaydet
+      if (consultationId) {
+        const consultation = await storage.get(consultationId);
+        if (consultation) {
+          consultation.soapNote = updatedSoapNote;
+          consultation.anamnese = updatedAnamnese;
+          consultation.updatedAt = new Date().toISOString();
+          await storage.save(consultation);
+        }
+      }
+
+      showSuccess(t("consultation.reanalyzeSuccess") || "Not başarıyla güncellendi!");
+    } catch (error: any) {
+      console.error("Reanalyze error:", error);
+      showError((t("consultation.reanalyzeError") || "Analiz sırasında bir hata oluştu") + ": " + error.message);
+    } finally {
+      setIsReanalyzing(false);
     }
   };
 
@@ -885,6 +949,25 @@ export default function NewConsultationPage() {
 
                 {activeTab === "note" && (
                   <div className="space-y-6">
+                    {/* Reanalyze Button */}
+                    <div className="flex justify-end">
+                      <button
+                        onClick={handleReanalyzeNote}
+                        disabled={isReanalyzing}
+                        className="flex items-center gap-2 px-4 py-2 bg-theme-primary text-white rounded-lg hover:bg-theme-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        {isReanalyzing ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <span>{t("consultation.reanalyzing") || "Analiz ediliyor..."}</span>
+                          </>
+                        ) : (
+                          <>
+                            <RefreshCw className="w-4 h-4" />
+                            <span>{t("consultation.reanalyze") || "Güncelle"}</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
                     {/* Anamnese Section */}
                     <AnamneseSection
                       kontaktgrund={anamnese.kontaktgrund}

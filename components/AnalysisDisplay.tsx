@@ -4,6 +4,7 @@ import { Edit2, Check, X, RotateCcw, Mic } from "lucide-react";
 import { useState } from "react";
 import DoctorNoteCreator from "./DoctorNoteCreator";
 import { useTheme } from "@/lib/ThemeContext";
+import { useLanguage } from "@/lib/LanguageContext";
 
 interface Analysis {
   patient_complaint: string;
@@ -32,6 +33,7 @@ export default function AnalysisDisplay({
   isLoading = false,
   showDoctorNoteCreator: initialShowCreator = false,
 }: AnalysisDisplayProps) {
+  const { t } = useLanguage();
   console.log(
     "🔍 [AnalysisDisplay] RENDER - Has analysis:",
     !!analysis,
@@ -161,7 +163,7 @@ export default function AnalysisDisplay({
                       ? "bg-gray-800 text-white border-gray-600 placeholder:text-gray-400"
                       : "bg-theme-card text-theme-text border-theme-border placeholder:text-theme-text-secondary"
                   }`}
-                  placeholder="Doktor notlarını buraya yazın..."
+                  placeholder={t("analysis.doctorNotesPlaceholder")}
                 />
                 <div className="flex gap-2">
                   <button

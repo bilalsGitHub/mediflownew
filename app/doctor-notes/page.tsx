@@ -6,6 +6,7 @@ import RecordingButton from '@/components/RecordingButton';
 import MainLayout from '@/components/layout/MainLayout';
 import { Copy, Check, Save, Loader2, Mic, FileText } from 'lucide-react';
 import { useTheme } from '@/lib/ThemeContext';
+import { useLanguage } from '@/lib/LanguageContext';
 
 type RewriteStyle = 'shorter' | 'detailed' | 'clearer' | 'professional' | 'structured' | 'summary';
 
@@ -21,6 +22,7 @@ const REWRITE_OPTIONS: Array<{ id: RewriteStyle; label: string; description: str
 export default function DoctorNotesPage() {
   const router = useRouter();
   const { themeId } = useTheme();
+  const { t } = useLanguage();
   const isDark = themeId === 'dark';
   const [step, setStep] = useState<'recording' | 'editing'>('recording');
   const [text, setText] = useState<string>('');
@@ -209,7 +211,7 @@ export default function DoctorNotesPage() {
                     ? 'bg-gray-800 text-white border-gray-600 placeholder:text-gray-400' 
                     : 'bg-theme-card text-theme-text border-theme-border placeholder:text-theme-text-secondary'
                 }`}
-                placeholder="Not metniniz burada görünecek..."
+                placeholder={t("doctorNotes.placeholder")}
               />
               
               <div className="mt-2 text-sm text-gray-500">

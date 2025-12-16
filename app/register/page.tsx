@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/AuthContext";
 import { Loader2 } from "lucide-react";
+import { useLanguage } from "@/lib/LanguageContext";
 
 const COUNTRIES = [
   "Germany",
@@ -32,6 +33,7 @@ const LANGUAGES = [
 export default function RegisterPage() {
   const router = useRouter();
   const { register } = useAuth();
+  const { t } = useLanguage();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -119,7 +121,7 @@ export default function RegisterPage() {
                 onChange={handleChange}
                 required
                 className="w-full px-4 py-2 border border-theme-border rounded-lg focus:outline-none focus:ring-2 focus:ring-theme-primary bg-theme-card text-theme-text"
-                placeholder="Dr. Max Mustermann"
+                placeholder={t("auth.fullNamePlaceholder")}
               />
             </div>
 
@@ -135,7 +137,7 @@ export default function RegisterPage() {
                 onChange={handleChange}
                 required
                 className="w-full px-4 py-2 border border-theme-border rounded-lg focus:outline-none focus:ring-2 focus:ring-theme-primary bg-theme-card text-theme-text"
-                placeholder="doctor@example.com"
+                placeholder={t("auth.emailPlaceholder")}
               />
             </div>
 
@@ -152,7 +154,7 @@ export default function RegisterPage() {
                 required
                 minLength={6}
                 className="w-full px-4 py-2 border border-theme-border rounded-lg focus:outline-none focus:ring-2 focus:ring-theme-primary bg-theme-card text-theme-text"
-                placeholder="En az 6 karakter"
+                placeholder={t("auth.passwordMinPlaceholder")}
               />
             </div>
 
@@ -168,7 +170,7 @@ export default function RegisterPage() {
                 onChange={handleChange}
                 required
                 className="w-full px-4 py-2 border border-theme-border rounded-lg focus:outline-none focus:ring-2 focus:ring-theme-primary bg-theme-card text-theme-text"
-                placeholder="Şifrenizi tekrar girin"
+                placeholder={t("auth.passwordConfirmPlaceholder")}
               />
             </div>
 
@@ -205,7 +207,7 @@ export default function RegisterPage() {
                 min="18"
                 max="100"
                 className="w-full px-4 py-2 border border-theme-border rounded-lg focus:outline-none focus:ring-2 focus:ring-theme-primary bg-theme-card text-theme-text"
-                placeholder="25"
+                placeholder={t("auth.agePlaceholder")}
               />
             </div>
 

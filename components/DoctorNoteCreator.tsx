@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import RecordingButton from './RecordingButton';
 import { Copy, Check, Mic, FileText, Loader2, X } from 'lucide-react';
+import { useLanguage } from '@/lib/LanguageContext';
 
 type RewriteStyle = 'shorter' | 'detailed' | 'clearer' | 'professional' | 'structured' | 'summary';
 
@@ -193,7 +194,7 @@ export default function DoctorNoteCreator({ initialText = '', onSave, onCancel }
               value={editedText}
               onChange={(e) => setEditedText(e.target.value)}
               className="w-full p-4 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-y min-h-[200px]"
-              placeholder="Not metniniz burada görünecek..."
+              placeholder={t("doctorNotes.placeholder")}
             />
             
             <div className="mt-2 text-sm text-gray-500">

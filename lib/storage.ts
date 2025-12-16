@@ -19,6 +19,8 @@ export interface ReferralReason {
   diagnosis?: string;
   requestedAction?: string;
   anamneseAndFindings?: string;
+  doctorName?: string;
+  doctorTitle?: string;
 }
 
 export interface ReferralResponse {

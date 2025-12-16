@@ -24,6 +24,7 @@ import {
 import { useTheme } from "@/lib/ThemeContext";
 import { useToast } from "@/lib/ToastContext";
 import { useLanguage } from "@/lib/LanguageContext";
+import { useAuth } from "@/lib/AuthContext";
 import ConfirmDialog from "./ConfirmDialog";
 
 type DocumentType = "patientMessage" | "referralReason" | "referralResponse";
@@ -55,6 +56,7 @@ function DocumentGenerator({
   );
   const { showSuccess, showError } = useToast();
   const { themeId } = useTheme();
+  const { user } = useAuth();
   const isDark = themeId === "dark";
   const [isGenerating, setIsGenerating] = useState(false);
   const [doctorInstructions, setDoctorInstructions] = useState("");
@@ -101,14 +103,44 @@ function DocumentGenerator({
       if ("treatment" in pm && pm.treatment) parts.push(pm.treatment);
       if ("recommendations" in pm && pm.recommendations)
         parts.push(pm.recommendations);
-      if ("closing" in pm && pm.closing) parts.push(pm.closing);
+
+      // Closing field'ını işle - eğer doktor ismi içeriyorsa çıkar
+      if ("closing" in pm && pm.closing) {
+        let closingText = pm.closing;
+        // Eğer closing içinde doktor ismi varsa, onu çıkar
+        if (pm.doctorName) {
+          // Doktor ismini ve title'ını kaldır (regex ile)
+          const doctorNamePattern = new RegExp(
+            `[,\\s]*${(pm.doctorTitle || "Dr\\.?\\s*(?:med\\.?)?\\s*").replace(
+              /[.*+?^${}()|[\]\\]/g,
+              "\\$&"
+            )}?\\s*${pm.doctorName.replace(
+              /[.*+?^${}()|[\]\\]/g,
+              "\\$&"
+            )}[,\\s]*`,
+            "gi"
+          );
+          closingText = closingText.replace(doctorNamePattern, "").trim();
+          // Eğer closing sadece "Mit freundlichen Grüßen," gibi bir şeyle bitiyorsa, virgülü kaldır
+          closingText = closingText.replace(/,\s*$/, "");
+        }
+        if (closingText) {
+          parts.push(closingText);
+        }
+      }
+
       if ("patientInfo" in pm && pm.patientInfo) parts.push(pm.patientInfo);
       if ("recommendedAction" in pm && pm.recommendedAction)
         parts.push(pm.recommendedAction);
       if ("thanks" in pm && pm.thanks) parts.push(pm.thanks);
+      // Doktor ismini ekle (tarihten önce)
       if (pm.doctorName || pm.doctorTitle) {
-        parts.push(`${pm.doctorTitle || ""} ${pm.doctorName || ""}`.trim());
+        const doctorSignature = `${pm.doctorTitle || ""} ${
+          pm.doctorName || ""
+        }`.trim();
+        parts.push(doctorSignature);
       }
+      // Tarih varsa EN SONA ekle
       if (pm.date) parts.push(pm.date);
       return parts.join("\n\n");
     } else {
@@ -122,6 +154,20 @@ function DocumentGenerator({
         parts.push(`Erbetene Maßnahme:\n${rr.requestedAction}`);
       if (rr.anamneseAndFindings)
         parts.push(`Anamnese und Befunde:\n${rr.anamneseAndFindings}`);
+      // Doktor ismini EN SONA ekle (eğer zaten metinde yoksa)
+      if (rr.doctorName || rr.doctorTitle) {
+        const doctorSignature = `${rr.doctorTitle || ""} ${
+          rr.doctorName || ""
+        }`.trim();
+        // Eğer herhangi bir kısımda doktor ismi zaten varsa, tekrar ekleme
+        const allText = parts.join("\n\n");
+        if (
+          !allText.includes(doctorSignature) &&
+          !allText.includes(rr.doctorName || "")
+        ) {
+          parts.push(doctorSignature);
+        }
+      }
       return parts.join("\n\n");
     }
   };
@@ -246,6 +292,7 @@ function DocumentGenerator({
             documentType: activeDocType,
             consultationData: consultation,
             currentDocument: currentDocument,
+            doctorName: (user?.fullName || "").trim(),
             language,
           }),
         });
@@ -260,6 +307,7 @@ function DocumentGenerator({
             documentType: activeDocType,
             consultationData: consultation,
             doctorInstructions: doctorInstructions || undefined,
+            doctorName: (user?.fullName || "").trim(),
             language,
           }),
         });

@@ -1,14 +1,23 @@
-import { NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import { NextRequest, NextResponse } from "next/server";
+import OpenAI from "openai";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-function getDocumentPrompts(documentType: string, language: 'de' | 'en' = 'de', patientName: string, complaint: string, symptoms: string, diagnosis: string, doctorInstructions?: string) {
-  if (language === 'en') {
+function getDocumentPrompts(
+  documentType: string,
+  language: "de" | "en" = "de",
+  patientName: string,
+  complaint: string,
+  symptoms: string,
+  diagnosis: string,
+  doctorInstructions?: string,
+  doctorName?: string
+) {
+  if (language === "en") {
     switch (documentType) {
-      case 'patientMessage':
+      case "patientMessage":
         return {
           systemPrompt: `You are a professional medical assistant who writes messages to patients.
 The message should:
@@ -23,18 +32,27 @@ Return the answer as JSON with the following fields:
   "diagnosis": "Diagnosis/findings in understandable language",
   "treatment": "Treatment performed or planned",
   "recommendations": "Recommendations for the patient",
-  "closing": "Closing with contact information"
+  "closing": "Closing with contact information (e.g. 'Best regards,' - DO NOT include doctor name here, doctor name is added as a separate field)"
 }`,
           userPrompt: `Patient: ${patientName}
 Complaint: ${complaint}
 Symptoms: ${symptoms}
 Diagnosis/Assessment: ${diagnosis}
+${doctorName ? `Doctor's name: ${doctorName}` : ""}
 
-${doctorInstructions ? `Additional instructions from the doctor: ${doctorInstructions}` : ''}
+${
+  doctorInstructions
+    ? `Additional instructions from the doctor: ${doctorInstructions}`
+    : ""
+}
 
-Create a professional message to the patient.`
+Create a professional message to the patient.${
+            doctorName
+              ? ` IMPORTANT: Use the doctor's name "${doctorName}" in the doctorName field, do NOT invent a different name.`
+              : ""
+          }`,
         };
-      case 'referralReason':
+      case "referralReason":
         return {
           systemPrompt: `You are a medical assistant who writes referral reasons.
 The referral reason should:
@@ -48,18 +66,29 @@ Return the answer as JSON with the following fields:
   "date": "Current date (Format: MM/DD/YYYY)",
   "diagnosis": "Diagnosis/Clinical question",
   "requestedAction": "Requested action",
-  "anamneseAndFindings": "Anamnesis and findings"
+  "anamneseAndFindings": "Anamnesis and findings",
+  "doctorName": "Doctor's name",
+  "doctorTitle": "Doctor's title (e.g. Dr.)"
 }`,
           userPrompt: `Patient: ${patientName}
 Complaint: ${complaint}
 Symptoms: ${symptoms}
 Diagnosis/Assessment: ${diagnosis}
+${doctorName ? `Doctor's name: ${doctorName}` : ""}
 
-${doctorInstructions ? `Additional instructions from the doctor: ${doctorInstructions}` : ''}
+${
+  doctorInstructions
+    ? `Additional instructions from the doctor: ${doctorInstructions}`
+    : ""
+}
 
-Create a precise referral reason.`
+Create a precise referral reason.${
+            doctorName
+              ? ` IMPORTANT: Use the doctor's name "${doctorName}" in the doctorName field, do NOT invent a different name.`
+              : ""
+          }`,
         };
-      case 'referralResponse':
+      case "referralResponse":
         return {
           systemPrompt: `You are a medical assistant who writes referral responses.
 The response should:
@@ -80,17 +109,26 @@ Return the answer as JSON with the following fields:
 Complaint: ${complaint}
 Symptoms: ${symptoms}
 Diagnosis/Assessment: ${diagnosis}
+${doctorName ? `Doctor's name: ${doctorName}` : ""}
 
-${doctorInstructions ? `Additional instructions from the doctor: ${doctorInstructions}` : ''}
+${
+  doctorInstructions
+    ? `Additional instructions from the doctor: ${doctorInstructions}`
+    : ""
+}
 
-Create a professional referral response.`
+Create a professional referral response.${
+            doctorName
+              ? ` IMPORTANT: Use the doctor's name "${doctorName}" in the doctorName field, do NOT invent a different name.`
+              : ""
+          }`,
         };
     }
   }
-  
+
   // German (default)
   switch (documentType) {
-    case 'patientMessage':
+    case "patientMessage":
       return {
         systemPrompt: `Du bist ein professioneller medizinischer Assistent, der Nachrichten an Patienten verfasst.
 Die Nachricht soll:
@@ -105,18 +143,27 @@ Gib die Antwort als JSON mit folgenden Feldern:
   "diagnosis": "Diagnose/Befund in verständlicher Sprache",
   "treatment": "Durchgeführte oder geplante Behandlung",
   "recommendations": "Empfehlungen für den Patienten",
-  "closing": "Abschluss mit Kontaktmöglichkeit"
+  "closing": "Abschluss mit Kontaktmöglichkeit (z.B. 'Mit freundlichen Grüßen,' - DOKTOR ISMI BURAYA EKLEME, doktor ismi ayrı bir field olarak eklenir)"
 }`,
         userPrompt: `Patient: ${patientName}
 Beschwerde: ${complaint}
 Symptome: ${symptoms}
 Diagnose/Beurteilung: ${diagnosis}
+${doctorName ? `Name des Arztes: ${doctorName}` : ""}
 
-${doctorInstructions ? `Zusätzliche Anweisungen vom Arzt: ${doctorInstructions}` : ''}
+${
+  doctorInstructions
+    ? `Zusätzliche Anweisungen vom Arzt: ${doctorInstructions}`
+    : ""
+}
 
-Erstelle eine professionelle Nachricht an den Patienten.`
+Erstelle eine professionelle Nachricht an den Patienten.${
+          doctorName
+            ? ` WICHTIG: Verwende den Arztnamen "${doctorName}" im doctorName-Feld, erfinde KEINEN anderen Namen.`
+            : ""
+        }`,
       };
-    case 'referralReason':
+    case "referralReason":
       return {
         systemPrompt: `Du bist ein medizinischer Assistent, der Überweisungsgründe verfasst.
 Der Überweisungsgrund soll:
@@ -130,18 +177,29 @@ Gib die Antwort als JSON mit folgenden Feldern:
   "date": "Aktuelles Datum (Format: DD.MM.YYYY)",
   "diagnosis": "Diagnose/Klinische Fragestellung",
   "requestedAction": "Erbetene Maßnahme",
-  "anamneseAndFindings": "Anamnese und Befunde"
+  "anamneseAndFindings": "Anamnese und Befunde",
+  "doctorName": "Name des Arztes",
+  "doctorTitle": "Titel des Arztes (z.B. Dr. med.)"
 }`,
         userPrompt: `Patient: ${patientName}
 Beschwerde: ${complaint}
 Symptome: ${symptoms}
 Diagnose/Beurteilung: ${diagnosis}
+${doctorName ? `Name des Arztes: ${doctorName}` : ""}
 
-${doctorInstructions ? `Zusätzliche Anweisungen vom Arzt: ${doctorInstructions}` : ''}
+${
+  doctorInstructions
+    ? `Zusätzliche Anweisungen vom Arzt: ${doctorInstructions}`
+    : ""
+}
 
-Erstelle einen präzisen Überweisungsgrund.`
+Erstelle einen präzisen Überweisungsgrund.${
+          doctorName
+            ? ` WICHTIG: Verwende den Arztnamen "${doctorName}" im doctorName-Feld, erfinde KEINEN anderen Namen.`
+            : ""
+        }`,
       };
-    case 'referralResponse':
+    case "referralResponse":
       return {
         systemPrompt: `Du bist ein medizinischer Assistent, der Überweisungsantworten verfasst.
 Die Antwort soll:
@@ -162,38 +220,69 @@ Gib die Antwort als JSON mit folgenden Feldern:
 Beschwerde: ${complaint}
 Symptome: ${symptoms}
 Diagnose/Beurteilung: ${diagnosis}
+${doctorName ? `Name des Arztes: ${doctorName}` : ""}
 
-${doctorInstructions ? `Zusätzliche Anweisungen vom Arzt: ${doctorInstructions}` : ''}
+${
+  doctorInstructions
+    ? `Zusätzliche Anweisungen vom Arzt: ${doctorInstructions}`
+    : ""
+}
 
-Erstelle eine professionelle Überweisungsantwort.`
+Erstelle eine professionelle Überweisungsantwort.${
+          doctorName
+            ? ` WICHTIG: Verwende den Arztnamen "${doctorName}" im doctorName-Feld, erfinde KEINEN anderen Namen.`
+            : ""
+        }`,
       };
   }
-  return { systemPrompt: '', userPrompt: '' };
+  return { systemPrompt: "", userPrompt: "" };
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const { documentType, consultationData, doctorInstructions, language = 'de' } = await request.json();
+    const {
+      documentType,
+      consultationData,
+      doctorInstructions,
+      doctorName = "",
+      language = "de",
+    } = await request.json();
 
     if (!documentType || !consultationData) {
       return NextResponse.json(
-        { error: 'Document type and consultation data are required' },
+        { error: "Document type and consultation data are required" },
         { status: 400 }
       );
     }
 
     // Build context from consultation
-    const patientName = consultationData.patientName || (language === 'en' ? 'Patient' : 'Patient');
-    const diagnosis = consultationData.soapNote?.beurteilungPlan || consultationData.analysis?.preliminary_summary || '';
-    const symptoms = consultationData.analysis?.symptoms?.join(', ') || '';
-    const complaint = consultationData.analysis?.patient_complaint || '';
+    const patientName =
+      consultationData.patientName ||
+      (language === "en" ? "Patient" : "Patient");
+    const diagnosis =
+      consultationData.soapNote?.beurteilungPlan ||
+      consultationData.analysis?.preliminary_summary ||
+      "";
+    const symptoms = consultationData.analysis?.symptoms?.join(", ") || "";
+    const complaint = consultationData.analysis?.patient_complaint || "";
 
-    const validLanguage = (language === 'en' || language === 'de') ? language : 'de';
-    const prompts = getDocumentPrompts(documentType, validLanguage, patientName, complaint, symptoms, diagnosis, doctorInstructions);
+    const validLanguage =
+      language === "en" || language === "de" ? language : "de";
+    const safeDoctorName = doctorName || "";
+    const prompts = getDocumentPrompts(
+      documentType,
+      validLanguage,
+      patientName,
+      complaint,
+      symptoms,
+      diagnosis,
+      doctorInstructions,
+      safeDoctorName
+    );
 
     if (!prompts.systemPrompt || !prompts.userPrompt) {
       return NextResponse.json(
-        { error: 'Invalid document type' },
+        { error: "Invalid document type" },
         { status: 400 }
       );
     }
@@ -201,48 +290,66 @@ export async function POST(request: NextRequest) {
     const { systemPrompt, userPrompt } = prompts;
 
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: "gpt-4o-mini",
       messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt },
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
       ],
       temperature: 0.7,
       max_tokens: 1000,
-      response_format: { type: 'json_object' },
+      response_format: { type: "json_object" },
     });
 
     const content = completion.choices[0]?.message?.content;
     if (!content) {
-      throw new Error('No response from AI');
+      throw new Error("No response from AI");
     }
 
     const document = JSON.parse(content);
 
     // Add current date and doctor info if not present
-    const dateLocale = validLanguage === 'en' ? 'en-US' : 'de-DE';
-    const dateFormat: Intl.DateTimeFormatOptions | undefined = validLanguage === 'en' 
-      ? { month: '2-digit', day: '2-digit', year: 'numeric' as const } 
-      : undefined;
+    const dateLocale = validLanguage === "en" ? "en-US" : "de-DE";
+    const dateFormat: Intl.DateTimeFormatOptions | undefined =
+      validLanguage === "en"
+        ? { month: "2-digit", day: "2-digit", year: "numeric" as const }
+        : undefined;
     const currentDate = dateFormat
       ? new Date().toLocaleDateString(dateLocale, dateFormat)
       : new Date().toLocaleDateString(dateLocale);
-    
-    if (documentType === 'patientMessage' || documentType === 'referralResponse') {
+
+    if (
+      documentType === "patientMessage" ||
+      documentType === "referralResponse"
+    ) {
       if (!document.date) document.date = currentDate;
-      if (!document.doctorName) document.doctorName = '';
-      if (!document.doctorTitle) document.doctorTitle = validLanguage === 'en' ? 'Dr.' : 'Dr. med.';
+      // Doktor ismini ekle veya düzelt (eğer AI farklı bir isim eklemişse)
+      if (safeDoctorName) {
+        // Eğer AI farklı bir isim eklemişse veya hiç eklememişse, bizim gönderdiğimizle değiştir
+        if (!document.doctorName || document.doctorName !== safeDoctorName) {
+          document.doctorName = safeDoctorName;
+        }
+      }
+      if (!document.doctorTitle)
+        document.doctorTitle = validLanguage === "en" ? "Dr." : "Dr. med.";
     }
-    if (documentType === 'referralReason' && !document.date) {
-      document.date = currentDate;
+    if (documentType === "referralReason") {
+      if (!document.date) document.date = currentDate;
+      // ReferralReason için de doktor ismini ekle veya düzelt
+      if (safeDoctorName) {
+        if (!document.doctorName || document.doctorName !== safeDoctorName) {
+          document.doctorName = safeDoctorName;
+        }
+      }
+      if (!document.doctorTitle)
+        document.doctorTitle = validLanguage === "en" ? "Dr." : "Dr. med.";
     }
 
     return NextResponse.json({ document });
   } catch (error: any) {
-    console.error('AI document generation error:', error);
+    console.error("AI document generation error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to generate document' },
+      { error: error.message || "Failed to generate document" },
       { status: 500 }
     );
   }
 }
-

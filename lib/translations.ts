@@ -60,6 +60,12 @@ export const translations = {
       testUser: "Testbenutzer",
       testEmail: "E-Mail: doctor@test.com",
       testPassword: "Passwort: test123",
+      emailPlaceholder: "doctor@example.com",
+      passwordPlaceholder: "••••••••",
+      fullNamePlaceholder: "Dr. Max Mustermann",
+      passwordMinPlaceholder: "Mindestens 6 Zeichen",
+      passwordConfirmPlaceholder: "Geben Sie Ihr Passwort erneut ein",
+      agePlaceholder: "25",
     },
     // Dashboard
     dashboard: {
@@ -194,6 +200,10 @@ export const translations = {
       template: "Template",
       templateChanging: "Template wird geändert...",
       regenerate: "Neu generieren",
+      reanalyze: "Aktualisieren",
+      reanalyzing: "Wird analysiert...",
+      reanalyzeSuccess: "Notiz erfolgreich aktualisiert!",
+      reanalyzeError: "Fehler beim Analysieren",
       addEntry: "Eintrag hinzufügen",
       addOrAdjust: "Hinzufügen oder anpassen",
       copyNote: "Notiz kopieren",
@@ -240,6 +250,27 @@ export const translations = {
       duration: "Dauer/Häufigkeit",
       summary: "Zusammenfassung",
       doctorNotes: "Arztnotizen",
+      doctorNotesPlaceholder: "Arztnotizen hier eingeben...",
+    },
+    // SOAP Notes
+    soap: {
+      kontaktgrundPlaceholder: "Kontaktgrund...",
+      aktuellerZustandPlaceholder: "Aktueller Zustand...",
+      subjektivPlaceholder: "Patientenbeschwerden...",
+      objektivPlaceholder: "Objektive Befunde...",
+      beurteilungPlanPlaceholder: "Beurteilung und Plan...",
+      anamnesePlaceholder: "Anamnese des Patienten...",
+      untersuchungPlaceholder: "Untersuchungsbefunde...",
+      beurteilungPlanShortPlaceholder: "Behandlungsplan...",
+    },
+    // Anamnese
+    anamnese: {
+      kontaktgrundPlaceholder: "Bauchschmerzen",
+      aktuellerZustandPlaceholder: "Bauchschmerzen beim Trinken von kaltem Wasser...",
+    },
+    // Doctor Notes
+    doctorNotes: {
+      placeholder: "Ihr Notiztext wird hier angezeigt...",
     },
     // Settings
     settings: {
@@ -304,6 +335,12 @@ export const translations = {
       testUser: "Test User",
       testEmail: "Email: doctor@test.com",
       testPassword: "Password: test123",
+      emailPlaceholder: "doctor@example.com",
+      passwordPlaceholder: "••••••••",
+      fullNamePlaceholder: "Dr. John Doe",
+      passwordMinPlaceholder: "At least 6 characters",
+      passwordConfirmPlaceholder: "Re-enter your password",
+      agePlaceholder: "25",
     },
     // Dashboard
     dashboard: {
@@ -437,6 +474,10 @@ export const translations = {
       template: "Template",
       templateChanging: "Changing template...",
       regenerate: "Regenerate",
+      reanalyze: "Update",
+      reanalyzing: "Analyzing...",
+      reanalyzeSuccess: "Note successfully updated!",
+      reanalyzeError: "Error analyzing",
       addEntry: "Add entry",
       addOrAdjust: "Add or adjust",
       copyNote: "Copy note",
@@ -482,6 +523,27 @@ export const translations = {
       duration: "Duration/Frequency",
       summary: "Summary",
       doctorNotes: "Doctor Notes",
+      doctorNotesPlaceholder: "Enter doctor notes here...",
+    },
+    // SOAP Notes
+    soap: {
+      kontaktgrundPlaceholder: "Contact reason...",
+      aktuellerZustandPlaceholder: "Current condition...",
+      subjektivPlaceholder: "Patient complaints...",
+      objektivPlaceholder: "Objective findings...",
+      beurteilungPlanPlaceholder: "Assessment and plan...",
+      anamnesePlaceholder: "Patient history...",
+      untersuchungPlaceholder: "Examination findings...",
+      beurteilungPlanShortPlaceholder: "Treatment plan...",
+    },
+    // Anamnese
+    anamnese: {
+      kontaktgrundPlaceholder: "Abdominal pain",
+      aktuellerZustandPlaceholder: "Abdominal pain when drinking cold water...",
+    },
+    // Doctor Notes
+    doctorNotes: {
+      placeholder: "Your note text will appear here...",
     },
     // Settings
     settings: {

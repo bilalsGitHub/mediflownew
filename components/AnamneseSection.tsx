@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { X, Plus, Mic, Copy } from "lucide-react";
 import { useTheme } from "@/lib/ThemeContext";
 import { useToast } from "@/lib/ToastContext";
+import { useLanguage } from "@/lib/LanguageContext";
 
 interface AnamneseSectionProps {
   kontaktgrund?: string;
@@ -35,6 +36,7 @@ export default function AnamneseSection({
 }: AnamneseSectionProps) {
   const { themeId } = useTheme();
   const { showSuccess } = useToast();
+  const { t } = useLanguage();
   const [localKontaktgrund, setLocalKontaktgrund] = useState(kontaktgrund);
   const [localAktuellerZustand, setLocalAktuellerZustand] =
     useState(aktuellerZustand);
@@ -116,7 +118,7 @@ export default function AnamneseSection({
                   type="text"
                   value={localKontaktgrund}
                   onChange={(e) => handleKontaktgrundChange(e.target.value)}
-                  placeholder="Bauchschmerzen"
+                  placeholder={t("anamnese.kontaktgrundPlaceholder")}
                   className={`w-full min-h-[60px] px-3 py-2 pb-10 pr-24 border rounded-lg focus:outline-none focus:ring-2 focus:ring-theme-primary focus:border-transparent ${
                     isDark
                       ? "bg-gray-800 text-white border-gray-600 placeholder:text-gray-400"
@@ -212,7 +214,7 @@ export default function AnamneseSection({
                   ref={aktuellerZustandTextareaRef}
                   value={localAktuellerZustand}
                   onChange={(e) => handleAktuellerZustandChange(e.target.value)}
-                  placeholder="Bauchschmerzen beim Trinken von kaltem Wasser..."
+                  placeholder={t("anamnese.aktuellerZustandPlaceholder")}
                   className={`w-full min-h-[100px] px-3 py-2 pb-12 border rounded-lg focus:outline-none focus:ring-2 focus:ring-theme-primary focus:border-transparent resize-y ${
                     isDark
                       ? "bg-gray-800 text-white border-gray-600 placeholder:text-gray-400"
