@@ -1,0 +1,23 @@
+-- ============================================
+-- SUPABASE DATABASE SCHEMA (ESKİ VERSİYON)
+-- ============================================
+-- 
+-- ⚠️ NOT: Bu dosya eski versiyondur.
+-- 
+-- YENİ VE KAPSAMLI SCHEMA İÇİN:
+-- 📁 supabase/schema.sql dosyasını kullanın
+-- 
+-- Bu dosya sadece referans amaçlıdır.
+-- Tüm güncel schema, RLS policies, triggers ve functions
+-- supabase/schema.sql dosyasında bulunmaktadır.
+-- 
+-- ============================================
+-- 
+-- KURULUM ADIMLARI:
+-- 1. supabase/schema.sql dosyasını Supabase Dashboard > SQL Editor'de çalıştırın
+-- 2. supabase/storage-setup.sql dosyasına göre storage bucket oluşturun
+-- 3. supabase/auth-setup.md dosyasına göre auth yapılandırması yapın
+-- 4. supabase/migration-guide.md dosyasına göre migration yapın
+-- 
+-- ============================================
+
