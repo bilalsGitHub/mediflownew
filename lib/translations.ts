@@ -82,8 +82,8 @@ export const translations = {
       timeSaved: "Zeitersparnis",
       feature1Title: "Automatische Aufnahme",
       feature1Desc:
-        "Einfach Mikrofon aktivieren – das System zeichnet das gesamte Gespräch auf",
-      feature1Time: "Spart 5-10 Min. pro Gespräch",
+        "Einfach Mikrofon aktivieren – System zeichnet gesamtes Gespräch auf",
+      feature1Time: "Spart 5-10 Min. pro Konsultation",
       feature2Title: "KI-Transkription",
       feature2Desc:
         "Gespräche werden automatisch in Text umgewandelt – präzise und sofort",
@@ -108,6 +108,23 @@ export const translations = {
       totalTimeSavedDesc:
         "Mehr Zeit für Ihre Patienten, weniger Zeit für Dokumentation",
       getStarted: "Jetzt starten",
+      faq: "Häufig gestellte Fragen",
+      faqTitle: "Häufig gestellte Fragen",
+      faqSubtitle: "Alles, was Sie über MediFlow wissen müssen",
+      faqItems: {
+        q1: "Wie funktioniert die automatische Aufnahme?",
+        a1: "Einfach das Mikrofon aktivieren und das System zeichnet das gesamte Gespräch automatisch auf. Die Aufnahme wird dann von KI in Text umgewandelt und analysiert.",
+        q2: "Ist meine Daten sicher?",
+        a2: "Ja, alle Daten werden DSGVO-konform verschlüsselt gespeichert. Wir verwenden modernste Sicherheitstechnologien zum Schutz Ihrer Patientendaten.",
+        q3: "Kann ich die KI-generierten Notizen bearbeiten?",
+        a3: "Ja, alle Notizen können jederzeit manuell bearbeitet werden. Die KI erstellt nur Vorschläge, die Sie nach Belieben anpassen können.",
+        q4: "Welche Sprachen werden unterstützt?",
+        a4: "Derzeit unterstützen wir Deutsch und Englisch. Weitere Sprachen sind in Planung.",
+        q5: "Was passiert nach der 7-tägigen Testphase?",
+        a5: "Nach der kostenlosen Testphase können Sie zwischen einem monatlichen (49,90 €) oder jährlichen (500 €) Abonnement wählen. Sie können jederzeit kündigen.",
+        q6: "Funktioniert es offline?",
+        a6: "Nein, MediFlow benötigt eine Internetverbindung für die KI-Analyse und Transkription. Die Aufnahme erfolgt jedoch lokal auf Ihrem Gerät.",
+      },
     },
     // Recording
     recording: {
@@ -208,9 +225,37 @@ export const translations = {
       addOrAdjust: "Hinzufügen oder anpassen",
       copyNote: "Notiz kopieren",
       deleteDocumentTitle: "Dokument löschen",
-      deleteDocumentMessage: "Möchten Sie dieses Dokument wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+      deleteDocumentMessage:
+        "Möchten Sie dieses Dokument wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
       clearDocumentTitle: "Dokument leeren",
-      clearDocumentMessage: "Möchten Sie den Dokumentinhalt wirklich leeren? Alle nicht gespeicherten Änderungen gehen verloren.",
+      clearDocumentMessage:
+        "Möchten Sie den Dokumentinhalt wirklich leeren? Alle nicht gespeicherten Änderungen gehen verloren.",
+      // Document Generator
+      selectDocumentType: "Bitte wählen Sie einen Dokumenttyp aus",
+      document: "Dokument",
+      documents: "Dokumente",
+      createNew: "Neu erstellen",
+      aiGenerate: "AI generieren",
+      generating: "Generiert...",
+      documentContentEmpty: "Dokumentinhalt darf nicht leer sein!",
+      documentUpdated: "Dokument aktualisiert!",
+      documentSaved: "Dokument gespeichert!",
+      documentCopied: "Dokument kopiert!",
+      documentCleared: "Dokument geleert!",
+      documentPlaceholder:
+        "Dokumentinhalt hier eingeben oder mit AI generieren...",
+      update: "Aktualisieren",
+      newSuggestionGenerated: "Neuer Vorschlag generiert!",
+      generationError: "Fehler beim Generieren:",
+      suggestionAccepted: "Vorschlag übernommen!",
+      suggestionRejected: "Vorschlag verworfen",
+      newAISuggestion: "Neuer Vorschlag von AI",
+      accept: "Übernehmen",
+      reject: "Verwerfen",
+      aiInstructions: "AI Anweisungen:",
+      edited: "Bearbeitet:",
+      suggestionReplaceWarning:
+        "Möchten Sie den aktuellen Dokumentinhalt mit dem AI-Vorschlag ersetzen? Diese Aktion kann nicht rückgängig gemacht werden (bis Sie speichern).",
       regenerateError:
         "Zum Neu generieren muss zuerst ein Notizinhalt vorhanden sein.",
       regenerateFailed: "Neu generieren fehlgeschlagen",
@@ -241,6 +286,13 @@ export const translations = {
       analyzingSpeakers: "Sprecher werden analysiert...",
       doctor: "Arzt",
       patient: "Patient",
+      notFound: "Konsultation nicht gefunden",
+      loadError: "Fehler beim Laden der Konsultation",
+      analysisFailed: "Analyse fehlgeschlagen",
+      templateAnalysisFailed: "Template-Analyse fehlgeschlagen",
+      templateChangeError: "Fehler beim Ändern des Templates",
+      noNoteContentToCopy: "Kein Notizinhalt zum Kopieren gefunden",
+      deleteError: "Fehler beim Löschen der Konsultation",
     },
     // Analysis
     analysis: {
@@ -266,11 +318,21 @@ export const translations = {
     // Anamnese
     anamnese: {
       kontaktgrundPlaceholder: "Bauchschmerzen",
-      aktuellerZustandPlaceholder: "Bauchschmerzen beim Trinken von kaltem Wasser...",
+      aktuellerZustandPlaceholder:
+        "Bauchschmerzen beim Trinken von kaltem Wasser...",
     },
     // Doctor Notes
     doctorNotes: {
       placeholder: "Ihr Notiztext wird hier angezeigt...",
+    },
+    // Voice Input
+    voiceInput: {
+      microphoneAccessFailed:
+        "Mikrofonzugriff fehlgeschlagen. Bitte erteilen Sie die Mikrofonberechtigung.",
+      processingError: "Audioverarbeitungsfehler:",
+      processing: "Wird verarbeitet...",
+      stopRecording: "Aufnahme stoppen",
+      startRecording: "Sprachaufnahme starten",
     },
     // Settings
     settings: {
@@ -382,6 +444,23 @@ export const translations = {
       totalTimeSavedDesc:
         "More time for your patients, less time for documentation",
       getStarted: "Get Started",
+      faq: "Frequently Asked Questions",
+      faqTitle: "Frequently Asked Questions",
+      faqSubtitle: "Everything you need to know about MediFlow",
+      faqItems: {
+        q1: "How does automatic recording work?",
+        a1: "Simply activate the microphone and the system automatically records the entire conversation. The recording is then converted to text and analyzed by AI.",
+        q2: "Is my data secure?",
+        a2: "Yes, all data is stored encrypted and GDPR compliant. We use state-of-the-art security technologies to protect your patient data.",
+        q3: "Can I edit the AI-generated notes?",
+        a3: "Yes, all notes can be edited manually at any time. The AI only creates suggestions that you can adjust as needed.",
+        q4: "Which languages are supported?",
+        a4: "Currently we support German and English. More languages are planned.",
+        q5: "What happens after the 7-day trial?",
+        a5: "After the free trial, you can choose between a monthly (€49.90) or yearly (€500) subscription. You can cancel at any time.",
+        q6: "Does it work offline?",
+        a6: "No, MediFlow requires an internet connection for AI analysis and transcription. However, recording takes place locally on your device.",
+      },
     },
     // Recording
     recording: {
@@ -482,9 +561,36 @@ export const translations = {
       addOrAdjust: "Add or adjust",
       copyNote: "Copy note",
       deleteDocumentTitle: "Delete Document",
-      deleteDocumentMessage: "Are you sure you want to delete this document? This action cannot be undone.",
+      deleteDocumentMessage:
+        "Are you sure you want to delete this document? This action cannot be undone.",
       clearDocumentTitle: "Clear Document",
-      clearDocumentMessage: "Are you sure you want to clear the document content? All unsaved changes will be lost.",
+      clearDocumentMessage:
+        "Are you sure you want to clear the document content? All unsaved changes will be lost.",
+      // Document Generator
+      selectDocumentType: "Please select a document type",
+      document: "Document",
+      documents: "Documents",
+      createNew: "Create New",
+      aiGenerate: "AI Generate",
+      generating: "Generating...",
+      documentContentEmpty: "Document content cannot be empty!",
+      documentUpdated: "Document updated!",
+      documentSaved: "Document saved!",
+      documentCopied: "Document copied!",
+      documentCleared: "Document cleared!",
+      documentPlaceholder: "Enter document content here or generate with AI...",
+      update: "Update",
+      newSuggestionGenerated: "New suggestion generated!",
+      generationError: "Generation error:",
+      suggestionAccepted: "Suggestion accepted!",
+      suggestionRejected: "Suggestion rejected",
+      newAISuggestion: "New AI Suggestion",
+      accept: "Accept",
+      reject: "Reject",
+      aiInstructions: "AI Instructions:",
+      edited: "Edited:",
+      suggestionReplaceWarning:
+        "Do you want to replace the current document content with the AI suggestion? This action cannot be undone (until you save).",
       regenerateError: "A note content must exist first to regenerate.",
       regenerateFailed: "Regenerate failed",
       regenerateSuccess: "Note successfully regenerated!",
@@ -514,6 +620,13 @@ export const translations = {
       analyzingSpeakers: "Analyzing speakers...",
       doctor: "Doctor",
       patient: "Patient",
+      notFound: "Consultation not found",
+      loadError: "Error loading consultation",
+      analysisFailed: "Analysis failed",
+      templateAnalysisFailed: "Template analysis failed",
+      templateChangeError: "Error changing template",
+      noNoteContentToCopy: "No note content found to copy",
+      deleteError: "Error deleting consultation",
     },
     // Analysis
     analysis: {
@@ -544,6 +657,43 @@ export const translations = {
     // Doctor Notes
     doctorNotes: {
       placeholder: "Your note text will appear here...",
+    },
+    // Voice Input
+    voiceInput: {
+      microphoneAccessFailed:
+        "Microphone access failed. Please grant microphone permission.",
+      processingError: "Audio processing error:",
+      processing: "Processing...",
+      stopRecording: "Stop recording",
+      startRecording: "Start recording",
+    },
+    // Pricing
+    pricing: {
+      menuLabel: "Pricing",
+      title: "Simple, transparent pricing",
+      subtitle: "Start your 7-day free trial. No hidden fees.",
+      proPlan: "Professional",
+      monthly: "Monthly",
+      yearly: "Yearly",
+      priceMonthly: "€49.90",
+      priceYearly: "€500",
+      perMonth: "/ month",
+      perYear: "/ year",
+      trial: "Try 7 days for free",
+      trialNote: "Then €49.90 monthly",
+      trialNoteYearly: "Then €500 yearly",
+      getStarted: "Get Started",
+      save: "Save",
+      features: {
+        unlimited: "Unlimited Consultations",
+        aiAnalysis: "Full AI Analysis",
+        soap: "Automated SOAP Notes",
+        documents: "Medical Letters & Referrals",
+        voice: "Voice Control",
+        support: "Priority Support",
+        security: "GDPR Compliant Security",
+      },
+      mostPopular: "Most Popular",
     },
     // Settings
     settings: {

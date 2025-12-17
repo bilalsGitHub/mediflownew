@@ -143,7 +143,7 @@ Gib die Antwort als JSON mit folgenden Feldern:
   "diagnosis": "Diagnose/Befund in verständlicher Sprache",
   "treatment": "Durchgeführte oder geplante Behandlung",
   "recommendations": "Empfehlungen für den Patienten",
-  "closing": "Abschluss mit Kontaktmöglichkeit (z.B. 'Mit freundlichen Grüßen,' - DOKTOR ISMI BURAYA EKLEME, doktor ismi ayrı bir field olarak eklenir)"
+  "closing": "Abschluss mit Kontaktmöglichkeit (z.B. 'Mit freundlichen Grüßen,' oder 'Herzliche Grüße,' - DOKTOR ISMI BURAYA ASLA EKLEME, doktor ismi ayrı bir field olarak eklenir)"
 }`,
         userPrompt: `Patient: ${patientName}
 Beschwerde: ${complaint}
@@ -290,13 +290,13 @@ export async function POST(request: NextRequest) {
     const { systemPrompt, userPrompt } = prompts;
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o", // Faster and more capable than gpt-4o-mini
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt },
       ],
-      temperature: 0.7,
-      max_tokens: 1000,
+      temperature: 0.5, // Lower temperature for faster, more consistent responses
+      max_tokens: 1200, // Slightly increased for completeness
       response_format: { type: "json_object" },
     });
 

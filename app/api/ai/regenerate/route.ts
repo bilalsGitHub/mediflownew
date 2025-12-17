@@ -35,6 +35,7 @@ export async function POST(request: NextRequest) {
     let documentType: string | undefined;
     let consultationData: any;
     let language: string = 'de';
+    let doctorName: string = ''; // Initialize at top level
 
     if (body.text) {
       // Old format: just text
@@ -44,7 +45,7 @@ export async function POST(request: NextRequest) {
       documentType = body.documentType;
       consultationData = body.consultationData;
       language = body.language || 'de';
-      const doctorName: string = body.doctorName || '';
+      doctorName = body.doctorName || ''; // Assign to top-level variable
       
       // Convert current document to text
       text = documentToText(body.currentDocument.content);
@@ -207,7 +208,7 @@ Gib die Antwort als JSON mit folgenden Feldern:
   "diagnosis": "Diagnose/Befund in verständlicher Sprache",
   "treatment": "Durchgeführte oder geplante Behandlung",
   "recommendations": "Empfehlungen für den Patienten",
-  "closing": "Abschluss mit Kontaktmöglichkeit (z.B. 'Mit freundlichen Grüßen,' - DOKTOR ISMI BURAYA EKLEME)",
+  "closing": "Abschluss mit Kontaktmöglichkeit (z.B. 'Mit freundlichen Grüßen,' oder 'Herzliche Grüße,' - DOKTOR ISMI BURAYA ASLA EKLEME, doktor ismi ayrı bir field olarak eklenir)",
   "date": "Aktuelles Datum (Format: DD.MM.YYYY)"
 }`;
             userPrompt = `Patient: ${patientName}
@@ -356,7 +357,7 @@ ${doctorInstructions}${varietyNote}${doctorName ? ` WICHTIG: Verwende den Arztna
     const userPrompt = `Aşağıdaki tıbbi notu yeniden düzenle ve iyileştir:\n\n${text}`;
 
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+        model: 'gpt-4o', // Faster and more capable
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt },

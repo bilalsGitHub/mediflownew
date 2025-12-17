@@ -13,13 +13,15 @@ import {
   Plus,
   Zap,
   ChevronDown,
-  Palette
+  Palette,
+  ChevronRight
 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useLanguage } from '@/lib/LanguageContext';
 import { useTheme } from '@/lib/ThemeContext';
 import { Language } from '@/lib/translations';
 import ThemeSelector from '@/components/ThemeSelector';
+import FAQSection from '@/components/FAQSection';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -56,23 +58,12 @@ export default function DashboardPage() {
     };
   }, [showProfileMenu]);
 
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (!isLoading && !user) {
-      router.push('/login');
-    }
-  }, [user, isLoading, router]);
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen" style={{ backgroundColor: 'var(--theme-background)' }}>
         <p className={isDark ? 'text-white' : 'text-theme-text-secondary'}>{t('common.loading')}</p>
       </div>
     );
-  }
-
-  if (!user) {
-    return null; // Will redirect
   }
 
   const features = [
@@ -126,6 +117,9 @@ export default function DashboardPage() {
     },
   ];
 
+  // Debug: Ensure we have 6 features
+  console.log('Dashboard features count:', features.length);
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--theme-background)' }}>
       {/* Top Navbar - Aktif sayfa göstergesi ile */}
@@ -142,14 +136,26 @@ export default function DashboardPage() {
             </div>
             
             <div className="flex items-center gap-3">
-              {/* Neue Konsultation - Mavi (ana aksiyon rengi) */}
-              <button
-                onClick={() => router.push('/new-consultation')}
-                className="flex items-center gap-2 px-4 py-2 bg-theme-primary hover:bg-theme-primary-dark text-white rounded-lg transition-all text-sm font-semibold shadow-md hover:shadow-lg"
-              >
-                <Plus className="w-4 h-4" />
-                <span className="hidden sm:inline">{t('dashboard.newConsultation')}</span>
-              </button>
+              {/* Neue Konsultation - Mavi (ana aksiyon rengi) - Sadece giriş yapıldığında */}
+              {user && (
+                <button
+                  onClick={() => router.push('/new-consultation')}
+                  className="flex items-center gap-2 px-4 py-2 bg-theme-primary hover:bg-theme-primary-dark text-white rounded-lg transition-all text-sm font-semibold shadow-md hover:shadow-lg"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span className="hidden sm:inline">{t('dashboard.newConsultation')}</span>
+                </button>
+              )}
+
+              {/* Login Button - Giriş yapılmadığında */}
+              {!user && (
+                <button
+                  onClick={() => router.push('/login')}
+                  className="flex items-center gap-2 px-4 py-2 bg-theme-primary hover:bg-theme-primary-dark text-white rounded-lg transition-all text-sm font-semibold shadow-md hover:shadow-lg"
+                >
+                  {t('auth.login')}
+                </button>
+              )}
 
               {/* Profile Dropdown */}
               {user && (
@@ -237,7 +243,7 @@ export default function DashboardPage() {
         {/* Hero Section */}
         <div className="text-center mb-12">
           <h1 className={`text-4xl md:text-5xl font-bold mb-4 ${isDark ? 'text-white' : 'text-theme-text'}`}>
-            {t('dashboard.welcome')}, {user.fullName.split(' ')[0]}
+            {user ? `${t('dashboard.welcome')}, ${user.fullName.split(' ')[0]}` : 'MediFlow'}
           </h1>
           <p className={`text-xl mb-2 max-w-2xl mx-auto ${isDark ? 'text-gray-300' : 'text-theme-text-secondary'}`}>
             {t('dashboard.purpose')}
@@ -250,11 +256,11 @@ export default function DashboardPage() {
         {/* CTA Button - Mavi (ana ürün rengi) */}
         <div className="flex justify-center mb-12">
           <button
-            onClick={() => router.push('/new-consultation')}
+            onClick={() => router.push(user ? '/new-consultation' : '/login')}
             className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg text-lg font-semibold shadow-xl shadow-blue-500/30 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-2xl hover:shadow-blue-500/40 flex items-center gap-2"
           >
             <Mic className="w-5 h-5" />
-            {t('dashboard.getStarted')}
+            {user ? t('dashboard.getStarted') : t('auth.login')}
           </button>
         </div>
 
@@ -264,7 +270,9 @@ export default function DashboardPage() {
             {t('dashboard.features')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature, index) => (
+            {features.map((feature, index) => {
+              // Ensure all 6 features are rendered
+              return (
               <div
                 key={index}
                 className={`rounded-lg p-6 shadow-sm border hover:shadow-md transition-shadow ${
@@ -291,12 +299,13 @@ export default function DashboardPage() {
                   </div>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
         {/* Time Saved Summary - Mavi → Mor gradient, desatüre */}
-        <div className="bg-gradient-to-r from-blue-500/90 via-blue-600/90 to-purple-600/90 rounded-lg p-8 text-white text-center shadow-lg">
+        <div className="bg-gradient-to-r from-blue-500/90 via-blue-600/90 to-purple-600/90 rounded-lg p-8 text-white text-center shadow-lg mb-12">
           <div className="max-w-2xl mx-auto">
             <Clock className="w-12 h-12 mx-auto mb-4 opacity-90" />
             <h2 className="text-2xl font-bold mb-2">
@@ -307,6 +316,9 @@ export default function DashboardPage() {
             </p>
           </div>
         </div>
+
+        {/* FAQ Section */}
+        <FAQSection />
       </div>
 
       {/* Theme Selector Modal */}

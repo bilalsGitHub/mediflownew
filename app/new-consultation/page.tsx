@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import RecordingButton from "@/components/RecordingButton";
 import AnalysisDisplay from "@/components/AnalysisDisplay";
@@ -809,14 +809,21 @@ export default function NewConsultationPage() {
     }, 3000);
   };
 
-  const tabs = [
-    {
-      id: "transcription",
-      label: "Transcription",
-      icon: <FileText className="w-4 h-4" />,
-    },
-    { id: "note", label: "Note", icon: <MessageSquare className="w-4 h-4" /> },
-  ];
+  const tabs = useMemo(
+    () => [
+      {
+        id: "transcription",
+        label: t("consultation.transcription"),
+        icon: <FileText className="w-4 h-4" />,
+      },
+      {
+        id: "note",
+        label: t("consultation.note"),
+        icon: <MessageSquare className="w-4 h-4" />,
+      },
+    ],
+    [t]
+  );
 
   return (
     <ProtectedRoute requiredRole="doctor">

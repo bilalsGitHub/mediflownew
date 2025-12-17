@@ -194,7 +194,7 @@ export default function ConsultationDetailPage() {
             router.push("/dashboard");
           } else {
             // On refresh, keep old consultation but show error toast
-            showError("Konsültasyon bulunamadı");
+            showError(t("consultation.notFound"));
             setIsRefreshing(false);
           }
           return;
@@ -288,7 +288,7 @@ export default function ConsultationDetailPage() {
         if (isFirstLoad) {
           router.push("/dashboard");
         } else {
-          showError("Konsültasyon yüklenirken bir hata oluştu");
+          showError(t("consultation.loadError"));
         }
       } finally {
         setIsInitialLoading(false);
@@ -381,7 +381,7 @@ export default function ConsultationDetailPage() {
       }
     } catch (error) {
       console.error("Error deleting consultation:", error);
-      showError("Konsültasyon silinirken bir hata oluştu.");
+      showError(t("consultation.deleteError"));
     }
 
     setIsDeleteDialogOpen(false);
@@ -526,7 +526,7 @@ export default function ConsultationDetailPage() {
         });
 
         if (!response.ok) {
-          throw new Error("Template analizi başarısız oldu");
+          throw new Error(t("consultation.templateAnalysisFailed"));
         }
 
         const { soapNote: newSoapNote } = await response.json();
@@ -559,7 +559,7 @@ export default function ConsultationDetailPage() {
         // Autosave useEffect'i kaydedecek, burada manuel kaydetmeye gerek yok
       } catch (error: any) {
         console.error("Template change error:", error);
-        showError("Template değiştirilirken bir hata oluştu: " + error.message);
+        showError(t("consultation.templateChangeError") + ": " + error.message);
       } finally {
         setIsTemplateChanging(false);
         setIsRegenerating(false);
@@ -644,7 +644,7 @@ export default function ConsultationDetailPage() {
   const handleReanalyze = async () => {
     const currentConsultation = consultation || previousConsultationRef.current;
     if (!currentConsultation || !currentConsultation.transcript) {
-      showError("Transkript bulunamadı");
+      showError(t("consultation.transcriptNotFound"));
       return;
     }
 
@@ -663,7 +663,7 @@ export default function ConsultationDetailPage() {
       });
 
       if (!response.ok) {
-        throw new Error("Analiz başarısız oldu");
+        throw new Error(t("consultation.analysisFailed"));
       }
 
       const { soapNote: newSoapNote } = await response.json();
@@ -679,7 +679,8 @@ export default function ConsultationDetailPage() {
 
       const updatedAnamnese = {
         kontaktgrund: newSoapNote.kontaktgrund || "",
-        aktueller_zustand: newSoapNote.aktueller_zustand || newSoapNote.aktuellerZustand || "",
+        aktueller_zustand:
+          newSoapNote.aktueller_zustand || newSoapNote.aktuellerZustand || "",
       };
 
       soapNoteRef.current = updatedSoapNote;
@@ -695,10 +696,10 @@ export default function ConsultationDetailPage() {
       await storage.save(updated);
       setConsultation(updated);
 
-      showSuccess("Not başarıyla güncellendi!");
+      showSuccess(t("consultation.reanalyzeSuccess"));
     } catch (error: any) {
       console.error("Reanalyze error:", error);
-      showError("Analiz sırasında bir hata oluştu: " + error.message);
+      showError(t("consultation.reanalyzeError") + ": " + error.message);
     } finally {
       setIsReanalyzing(false);
     }
@@ -864,9 +865,9 @@ export default function ConsultationDetailPage() {
     const content = getNoteContent();
     if (content) {
       navigator.clipboard.writeText(content);
-      showSuccess("Not kopyalandı!");
+      showSuccess(t("consultation.copyNote") + "!");
     } else {
-      showError("Kopyalanacak not içeriği bulunamadı.");
+      showError(t("consultation.noNoteContentToCopy"));
     }
   };
 
@@ -993,7 +994,7 @@ export default function ConsultationDetailPage() {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString("tr-TR", {
+    return date.toLocaleDateString(language === "de" ? "de-DE" : "en-US", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
@@ -1007,31 +1008,31 @@ export default function ConsultationDetailPage() {
     () => [
       {
         id: "transcription",
-        label: "Transcription",
+        label: t("consultation.transcription"),
         icon: <FileText className="w-4 h-4" />,
       },
       {
         id: "note",
-        label: "Note",
+        label: t("consultation.note"),
         icon: <MessageSquare className="w-4 h-4" />,
       },
       {
         id: "patientMessage",
-        label: "Nachricht an den Patienten",
+        label: t("consultation.patientMessage"),
         icon: <FileText className="w-4 h-4" />,
       },
       {
         id: "referralReason",
-        label: "Überweisungsgrund",
+        label: t("consultation.referralReason"),
         icon: <FileText className="w-4 h-4" />,
       },
       {
         id: "referralResponse",
-        label: "Überweisungsantwort",
+        label: t("consultation.referralResponse"),
         icon: <FileText className="w-4 h-4" />,
       },
     ],
-    []
+    [t]
   );
 
   // Use previous consultation during transition if current is null
@@ -1084,7 +1085,9 @@ export default function ConsultationDetailPage() {
         className="min-h-screen p-4 md:p-8 flex items-center justify-center"
         style={{ backgroundColor: "var(--theme-background)" }}>
         <div className="text-center">
-          <p className="text-theme-text-secondary">Konsültasyon bulunamadı</p>
+          <p className="text-theme-text-secondary">
+            {t("consultation.notFound")}
+          </p>
         </div>
       </div>
     );
@@ -1171,7 +1174,7 @@ export default function ConsultationDetailPage() {
               <button
                 onClick={() => setShowCreateDocDropdown(!showCreateDocDropdown)}
                 className="px-3 py-1.5 text-sm text-theme-text-secondary hover:text-theme-text hover:bg-theme-primary-light rounded-lg transition-colors flex items-center gap-1">
-                <span>Create document</span>
+                <span>{t("consultation.createDocument")}</span>
                 <span className="text-lg">+</span>
               </button>
               {showCreateDocDropdown && (
@@ -1182,7 +1185,7 @@ export default function ConsultationDetailPage() {
                       setShowCreateDocDropdown(false);
                     }}
                     className="w-full text-left px-4 py-3 hover:bg-theme-primary-light transition-colors first:rounded-t-lg text-theme-text">
-                    Nachricht an den Patienten
+                    {t("consultation.patientMessage")}
                   </button>
                   <button
                     onClick={() => {
@@ -1190,7 +1193,7 @@ export default function ConsultationDetailPage() {
                       setShowCreateDocDropdown(false);
                     }}
                     className="w-full text-left px-4 py-3 hover:bg-theme-primary-light transition-colors text-theme-text">
-                    Überweisungsgrund
+                    {t("consultation.referralReason")}
                   </button>
                   <button
                     onClick={() => {
@@ -1198,7 +1201,7 @@ export default function ConsultationDetailPage() {
                       setShowCreateDocDropdown(false);
                     }}
                     className="w-full text-left px-4 py-3 hover:bg-theme-primary-light transition-colors last:rounded-b-lg text-theme-text">
-                    Überweisungsantwort
+                    {t("consultation.referralResponse")}
                   </button>
                 </div>
               )}
@@ -1270,12 +1273,12 @@ export default function ConsultationDetailPage() {
                   {isReanalyzing ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Analiz ediliyor...</span>
+                      <span>{t("consultation.reanalyzing")}</span>
                     </>
                   ) : (
                     <>
                       <RefreshCw className="w-4 h-4" />
-                      <span>Güncelle</span>
+                      <span>{t("consultation.reanalyze")}</span>
                     </>
                   )}
                 </button>
@@ -1336,9 +1339,17 @@ export default function ConsultationDetailPage() {
                   selectedTemplate as "dokumentation" | "kurzdokumentation"
                 }
                 onAddOrAdjust={(field, currentText) => {
-                  setAddOrAdjustTarget({ 
-                    type: field as "subjektiv" | "objektiv" | "beurteilungPlan" | "anamnese" | "untersuchung" | "kontaktgrund" | "aktueller_zustand" | null, 
-                    currentText 
+                  setAddOrAdjustTarget({
+                    type: field as
+                      | "subjektiv"
+                      | "objektiv"
+                      | "beurteilungPlan"
+                      | "anamnese"
+                      | "untersuchung"
+                      | "kontaktgrund"
+                      | "aktueller_zustand"
+                      | null,
+                    currentText,
                   });
                   setIsAddOrAdjustOpen(true);
                 }}
@@ -1357,7 +1368,7 @@ export default function ConsultationDetailPage() {
         }}
         onAdd={handleAddOrAdjustConfirm}
         currentText={addOrAdjustTarget.currentText || ""}
-        fieldLabel={addOrAdjustTarget.type || "Not"}
+        fieldLabel={addOrAdjustTarget.type || t("consultation.note")}
       />
 
       <ConfirmDialog

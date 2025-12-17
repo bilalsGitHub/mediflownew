@@ -22,13 +22,14 @@ function Tabs({ tabs, activeTab, onTabChange }: TabsProps) {
     tabs.length
   );
   return (
-    <div>
-      <nav className="flex space-x-8" aria-label="Tabs">
+    <div id="tabs-container">
+      <nav id="tabs-nav" className="flex space-x-8" aria-label="Tabs">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.id}
+              id={`tab-${tab.id}`}
               onClick={() => onTabChange(tab.id)}
               className={`
                 flex items-center gap-2 py-2 px-4 font-normal text-sm transition-colors relative rounded-lg

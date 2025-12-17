@@ -67,6 +67,8 @@ function DocumentGenerator({
   const [isCreatingNew, setIsCreatingNew] = useState(false);
   const [aiSuggestion, setAiSuggestion] = useState<string | null>(null);
   const [showList, setShowList] = useState(true);
+  const [interimText, setInterimText] = useState<string>("");
+  const lastCursorPositionRef = useRef<number | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { t } = useLanguage();
 
@@ -109,20 +111,32 @@ function DocumentGenerator({
         let closingText = pm.closing;
         // Eğer closing içinde doktor ismi varsa, onu çıkar
         if (pm.doctorName) {
-          // Doktor ismini ve title'ını kaldır (regex ile)
-          const doctorNamePattern = new RegExp(
+          const escapedName = pm.doctorName.replace(
+            /[.*+?^${}()|[\]\\]/g,
+            "\\$&"
+          );
+
+          // Önce "Herzliche Grüße, Bilal Hinislioglu" gibi formatları yakala (virgülden sonra isim)
+          const commaNamePattern = new RegExp(`,\\s*${escapedName}\\s*$`, "gi");
+          closingText = closingText.replace(commaNamePattern, "");
+
+          // Sonra doktor ismini (title olmadan) herhangi bir yerde kaldır
+          const namePattern = new RegExp(`\\s+${escapedName}\\s*$`, "gi");
+          closingText = closingText.replace(namePattern, "");
+
+          // Sonra doktor title'ı ile birlikte olan versiyonu kaldır
+          const titlePattern = new RegExp(
             `[,\\s]*${(pm.doctorTitle || "Dr\\.?\\s*(?:med\\.?)?\\s*").replace(
               /[.*+?^${}()|[\]\\]/g,
               "\\$&"
-            )}?\\s*${pm.doctorName.replace(
-              /[.*+?^${}()|[\]\\]/g,
-              "\\$&"
-            )}[,\\s]*`,
+            )}?\\s*${escapedName}[,\\s]*`,
             "gi"
           );
-          closingText = closingText.replace(doctorNamePattern, "").trim();
-          // Eğer closing sadece "Mit freundlichen Grüßen," gibi bir şeyle bitiyorsa, virgülü kaldır
-          closingText = closingText.replace(/,\s*$/, "");
+          closingText = closingText.replace(titlePattern, "");
+
+          // Virgül ve boşlukları temizle
+          closingText = closingText.replace(/,\s*$/, "").trim();
+          closingText = closingText.replace(/^\s*,\s*/, "").trim();
         }
         if (closingText) {
           parts.push(closingText);
@@ -335,7 +349,7 @@ function DocumentGenerator({
       if (selectedDocumentId) {
         // Show as suggestion for existing document
         setAiSuggestion(formattedText);
-        showSuccess("Neuer Vorschlag generiert!");
+        showSuccess(t("consultation.newSuggestionGenerated"));
       } else {
         // Set directly for new document
         setDocumentText(formattedText);
@@ -344,7 +358,7 @@ function DocumentGenerator({
       }
     } catch (error: any) {
       console.error("Document generation error:", error);
-      showError("Fehler beim Generieren: " + error.message);
+      showError(t("consultation.generationError") + " " + error.message);
     } finally {
       setIsGenerating(false);
     }
@@ -361,7 +375,7 @@ function DocumentGenerator({
 
     setDocumentText(aiSuggestion);
     setAiSuggestion(null);
-    showSuccess("Vorschlag übernommen!");
+    showSuccess(t("consultation.suggestionAccepted"));
   };
 
   const handleConfirmAcceptSuggestion = () => {
@@ -369,17 +383,17 @@ function DocumentGenerator({
     setDocumentText(aiSuggestion);
     setAiSuggestion(null);
     setAcceptSuggestionDialogOpen(false);
-    showSuccess("Vorschlag übernommen!");
+    showSuccess(t("consultation.suggestionAccepted"));
   };
 
   const handleRejectSuggestion = () => {
     setAiSuggestion(null);
-    showSuccess("Vorschlag verworfen");
+    showSuccess(t("consultation.suggestionRejected"));
   };
 
   const handleSaveDocument = () => {
     if (!activeDocType || !documentText.trim()) {
-      showError("Doküman içeriği boş olamaz!");
+      showError(t("consultation.documentContentEmpty"));
       return;
     }
 
@@ -394,7 +408,7 @@ function DocumentGenerator({
         updatedAt: now,
       };
       onSave(updated);
-      showSuccess("Doküman güncellendi!");
+      showSuccess(t("consultation.documentUpdated"));
     } else {
       // Create new
       const newDoc: SavedDocument = {
@@ -410,7 +424,7 @@ function DocumentGenerator({
       onSave(newDoc);
       setSelectedDocumentId(newDoc.id);
       setIsCreatingNew(false);
-      showSuccess("Doküman kaydedildi!");
+      showSuccess(t("consultation.documentSaved"));
     }
   };
 
@@ -448,7 +462,7 @@ function DocumentGenerator({
 
   const handleCopyDocument = () => {
     navigator.clipboard.writeText(documentText);
-    showSuccess("Doküman kopyalandı!");
+    showSuccess(t("consultation.documentCopied"));
   };
 
   const handleClearDocument = () => {
@@ -460,103 +474,233 @@ function DocumentGenerator({
     setSelectedDocumentId(null);
     setIsCreatingNew(true);
     setClearDialogOpen(false);
-    showSuccess("Doküman temizlendi!");
+    showSuccess(t("consultation.documentCleared"));
   };
 
   const handleVoiceTranscript = (text: string) => {
+    if (!textareaRef.current) return;
+
+    const textarea = textareaRef.current;
     const currentText = documentText || "";
-    setDocumentText(currentText + (currentText ? " " : "") + text);
+
+    // Kullanılacak cursor pozisyonunu belirle
+    // Eğer konuşma devam ediyorsa kaydedilmiş pozisyonu kullan, yoksa güncel pozisyonu al
+    const cursorPosition =
+      lastCursorPositionRef.current !== null
+        ? lastCursorPositionRef.current
+        : textarea.selectionStart || currentText.length;
+
+    const textBeforeCursor = currentText.substring(0, cursorPosition);
+    const textAfterCursor = currentText.substring(cursorPosition);
+
+    const hasSpaceBefore =
+      textBeforeCursor &&
+      !textBeforeCursor.endsWith(" ") &&
+      textBeforeCursor.length > 0;
+    const hasSpaceAfter = textAfterCursor && !textAfterCursor.startsWith(" ");
+
+    // Cursor pozisyonuna metni ekle
+    const newText =
+      textBeforeCursor +
+      (hasSpaceBefore ? " " : "") +
+      text +
+      (hasSpaceAfter ? " " : "") +
+      textAfterCursor;
+
+    setDocumentText(newText);
+    setInterimText(""); // Clear interim text when final transcript arrives
+
+    // Final transcript eklendiği için ref'i sıfırla
+    lastCursorPositionRef.current = null;
+
+    // Cursor pozisyonunu güncelle ve scroll yap (eklenen metnin sonuna)
     setTimeout(() => {
       if (textareaRef.current) {
-        textareaRef.current.focus();
-        const len = textareaRef.current.value.length;
-        textareaRef.current.setSelectionRange(len, len);
+        const textarea = textareaRef.current;
+        textarea.focus();
+
+        // Yeni cursor pozisyonu: Eklenen metnin sonu
+        const newCursorPosition =
+          cursorPosition + text.length + (hasSpaceBefore ? 1 : 0);
+
+        textarea.setSelectionRange(newCursorPosition, newCursorPosition);
+
+        // Cursor'ı görünür hale getir (scroll to cursor)
+        const lineHeight =
+          parseInt(getComputedStyle(textarea).lineHeight) || 20;
+        const textBeforeNewCursor = textarea.value.substring(
+          0,
+          newCursorPosition
+        );
+        const lines = textBeforeNewCursor.split("\n").length;
+        const scrollTop = Math.max(0, (lines - 3) * lineHeight);
+        textarea.scrollTop = scrollTop;
       }
-    }, 100);
+    }, 50);
+  };
+
+  const handleInterimTranscript = (text: string) => {
+    if (!textareaRef.current) {
+      setInterimText("");
+      lastCursorPositionRef.current = null;
+      return;
+    }
+
+    const textarea = textareaRef.current;
+    const currentText = documentText || "";
+
+    // Yeni konuşma başlıyorsa (text var ve ref null) cursor pozisyonunu kaydet
+    if (text && lastCursorPositionRef.current === null) {
+      // SelectionStart, interim metin yokken güvenilirdir
+      const pos =
+        textarea.selectionStart !== undefined
+          ? textarea.selectionStart
+          : currentText.length;
+      lastCursorPositionRef.current = pos;
+    }
+
+    // Eğer text boşaldıysa ref'i burada sıfırlama, handleVoiceTranscript halledecek
+    if (!text) {
+      setInterimText("");
+      return;
+    }
+
+    const cursorPosition =
+      lastCursorPositionRef.current !== null
+        ? lastCursorPositionRef.current
+        : currentText.length;
+    const textBeforeCursor = currentText.substring(0, cursorPosition);
+    const textAfterCursor = currentText.substring(cursorPosition);
+
+    const hasSpaceBefore =
+      textBeforeCursor &&
+      !textBeforeCursor.endsWith(" ") &&
+      textBeforeCursor.length > 0;
+    const hasSpaceAfter = textAfterCursor && !textAfterCursor.startsWith(" ");
+
+    // Combine current text with interim transcript at cursor position
+    const displayText =
+      textBeforeCursor +
+      (hasSpaceBefore ? " " : "") +
+      text +
+      (hasSpaceAfter ? " " : "") +
+      textAfterCursor;
+
+    setInterimText(displayText);
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("de-DE", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    const { language } = useLanguage();
+    return new Date(dateString).toLocaleDateString(
+      language === "de" ? "de-DE" : "en-US",
+      {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      }
+    );
   };
 
   if (!activeDocType) {
     return (
       <div className="text-center py-12 text-theme-text-secondary">
-        <p>Bitte wählen Sie einen Dokumenttyp aus</p>
+        <p>{t("consultation.selectDocumentType")}</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div id="document-generator" className="space-y-4">
       {/* Header with List Toggle */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <div
+        id="document-generator-header"
+        className="flex items-center justify-between">
+        <div
+          id="document-generator-left-actions"
+          className="flex items-center gap-3">
           <button
+            id="document-list-toggle"
             onClick={() => setShowList(!showList)}
             className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-2">
             <FileText className="w-4 h-4" />
             <span>
               {filteredDocuments.length}{" "}
-              {filteredDocuments.length === 1 ? "Dokument" : "Dokumente"}
+              {filteredDocuments.length === 1
+                ? t("consultation.document")
+                : t("consultation.documents")}
             </span>
           </button>
           <button
+            id="document-create-new"
             onClick={handleCreateNew}
             className="px-3 py-1.5 text-sm bg-purple-600 hover:bg-purple-700 text-white rounded-lg flex items-center gap-2 transition-colors">
             <Plus className="w-4 h-4" />
-            <span>Neu erstellen</span>
+            <span>{t("consultation.createNew")}</span>
           </button>
         </div>
 
         {/* Action Buttons - Sağ üst */}
-        <div className="flex items-center gap-2">
-          <VoiceInput
-            onTranscript={handleVoiceTranscript}
-            buttonSize="sm"
-            className="!w-8 !h-8"
-          />
+        <div
+          id="document-generator-right-actions"
+          className="flex items-center gap-2">
+          <div id="document-voice-input">
+            <VoiceInput
+              onTranscript={handleVoiceTranscript}
+              onInterimTranscript={handleInterimTranscript}
+              buttonSize="sm"
+              className="!w-8 !h-8"
+            />
+          </div>
           <button
+            id="document-copy"
             onClick={handleCopyDocument}
             className="p-1.5 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
-            title="Kopieren">
+            title={t("consultation.copy")}>
             <Copy className="w-4 h-4" />
           </button>
           <button
+            id="document-clear"
             onClick={handleClearDocument}
             className="p-1.5 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-            title="Löschen">
+            title={t("consultation.delete")}>
             <Trash2 className="w-4 h-4" />
           </button>
           {/* AI generieren Button */}
           <button
+            id="document-ai-generate"
             onClick={handleGenerateDocument}
             disabled={isGenerating}
             className="flex items-center gap-2 px-4 py-2 text-sm bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
             {isGenerating ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Generiert...</span>
+                <span>{t("consultation.generating")}</span>
               </>
             ) : (
               <>
                 <Sparkles className="w-4 h-4" />
-                <span>AI generieren</span>
+                <span>{t("consultation.aiGenerate")}</span>
               </>
             )}
+          </button>
+          <button
+            id="document-save"
+            onClick={handleSaveDocument}
+            className="px-4 py-2 text-sm bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors">
+            {currentDocument
+              ? t("consultation.update")
+              : t("consultation.save")}
           </button>
         </div>
       </div>
 
       {/* Document List */}
       {showList && filteredDocuments.length > 0 && (
-        <div className="bg-theme-primary-light rounded-lg border border-theme-border p-4 max-h-64 overflow-y-auto">
+        <div
+          id="document-list"
+          className="bg-theme-primary-light rounded-lg border border-theme-border p-4 max-h-64 overflow-y-auto">
           <div className="space-y-2">
             {filteredDocuments
               .sort(
@@ -567,6 +711,7 @@ function DocumentGenerator({
               .map((doc) => (
                 <div
                   key={doc.id}
+                  id={`document-item-${doc.id}`}
                   className={`p-3 rounded-lg border cursor-pointer transition-all ${
                     selectedDocumentId === doc.id
                       ? "bg-purple-100 border-purple-500 border-2 shadow-sm"
@@ -589,7 +734,10 @@ function DocumentGenerator({
                               ? "text-purple-900"
                               : "text-theme-text"
                           }`}>
-                          {doc.title || `Dokument ${formatDate(doc.createdAt)}`}
+                          {doc.title ||
+                            `${t("consultation.document")} ${formatDate(
+                              doc.createdAt
+                            )}`}
                         </p>
                       </div>
                       <p className="text-xs text-theme-text-secondary">
@@ -598,21 +746,23 @@ function DocumentGenerator({
                     </div>
                     <div className="flex items-center gap-1 ml-2">
                       <button
+                        id={`document-edit-${doc.id}`}
                         onClick={(e) => {
                           e.stopPropagation();
                           handleSelectDocument(doc);
                         }}
                         className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded transition-colors"
-                        title="Bearbeiten">
+                        title={t("consultation.edit")}>
                         <Edit2 className="w-4 h-4" />
                       </button>
                       <button
+                        id={`document-delete-${doc.id}`}
                         onClick={(e) => {
                           e.stopPropagation();
                           handleDeleteDocument(doc.id);
                         }}
                         className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                        title="Löschen">
+                        title={t("consultation.delete")}>
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -625,35 +775,46 @@ function DocumentGenerator({
 
       {/* AI Instructions (Collapsible) */}
       {doctorInstructions && (
-        <div className="p-3 bg-purple-50 rounded-lg border border-purple-200 text-sm text-gray-600">
-          <strong>AI Anweisungen:</strong> {doctorInstructions}
+        <div
+          id="document-ai-instructions"
+          className="p-3 bg-purple-50 rounded-lg border border-purple-200 text-sm text-gray-600">
+          <strong>{t("consultation.aiInstructions")}</strong>{" "}
+          {doctorInstructions}
         </div>
       )}
 
       {/* AI Suggestion Banner */}
       {aiSuggestion && (
-        <div className="bg-purple-50 border-2 border-purple-300 rounded-lg p-4 space-y-3 animate-in fade-in slide-in-from-top-2 shadow-md">
+        <div
+          id="document-ai-suggestion"
+          className="bg-purple-50 border-2 border-purple-300 rounded-lg p-4 space-y-3 animate-in fade-in slide-in-from-top-2 shadow-md">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-2 text-purple-900">
               <Sparkles className="w-5 h-5 text-purple-600" />
-              <h3 className="font-semibold text-lg">Neuer Vorschlag von AI</h3>
+              <h3 className="font-semibold text-lg">
+                {t("consultation.newAISuggestion")}
+              </h3>
             </div>
             <div className="flex items-center gap-2">
               <button
+                id="document-accept-suggestion"
                 onClick={handleAcceptSuggestion}
                 className="px-4 py-2 text-sm bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors flex items-center gap-2 shadow-sm">
                 <Check className="w-4 h-4" />
-                Übernehmen
+                {t("consultation.accept")}
               </button>
               <button
+                id="document-reject-suggestion"
                 onClick={handleRejectSuggestion}
                 className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 border border-gray-300 rounded-lg transition-colors flex items-center gap-2">
                 <X className="w-4 h-4" />
-                Verwerfen
+                {t("consultation.reject")}
               </button>
             </div>
           </div>
-          <div className="bg-white rounded-lg border border-purple-200 p-4 text-sm text-gray-800 max-h-60 overflow-y-auto whitespace-pre-wrap shadow-inner">
+          <div
+            id="document-ai-suggestion-content"
+            className="bg-white rounded-lg border border-purple-200 p-4 text-sm text-gray-800 max-h-60 overflow-y-auto whitespace-pre-wrap shadow-inner">
             {aiSuggestion}
           </div>
           <p className="text-xs text-purple-700 italic">
@@ -664,11 +825,16 @@ function DocumentGenerator({
       )}
 
       {/* Main Editor */}
-      <div className="relative">
+      <div id="document-editor-wrapper" className="relative">
         {currentDocument && (
-          <div className="mb-2 flex items-center justify-between text-xs text-gray-500">
-            <span>Bearbeitet: {formatDate(currentDocument.updatedAt)}</span>
+          <div
+            id="document-editor-header"
+            className="mb-2 flex items-center justify-between text-xs text-gray-500">
+            <span>
+              {t("consultation.edited")} {formatDate(currentDocument.updatedAt)}
+            </span>
             <button
+              id="document-close-editor"
               onClick={() => {
                 setSelectedDocumentId(null);
                 setIsCreatingNew(true);
@@ -680,26 +846,21 @@ function DocumentGenerator({
           </div>
         )}
         <textarea
+          id="document-textarea"
           ref={textareaRef}
-          value={documentText}
-          onChange={(e) => setDocumentText(e.target.value)}
-          placeholder="Dokumentinhalt hier eingeben oder mit AI generieren..."
+          value={interimText || documentText}
+          onChange={(e) => {
+            setDocumentText(e.target.value);
+            setInterimText(""); // Clear interim when user types
+          }}
+          placeholder={t("consultation.documentPlaceholder")}
           className={`w-full min-h-[500px] px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-theme-primary resize-none leading-relaxed ${
             isDark
               ? "bg-gray-800 text-white border-gray-600 placeholder:text-gray-400"
               : "bg-theme-card text-theme-text border-theme-border placeholder:text-theme-text-secondary"
-          }`}
+          } ${interimText ? "italic text-gray-500" : ""}`}
           style={{ fontFamily: "inherit" }}
         />
-      </div>
-
-      {/* Bottom Toolbar - Sadece Save butonu */}
-      <div className="flex items-center justify-end pt-2 border-t border-gray-200">
-        <button
-          onClick={handleSaveDocument}
-          className="px-4 py-2 text-sm bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors">
-          {currentDocument ? "Aktualisieren" : "Speichern"}
-        </button>
       </div>
 
       {/* Delete Document Dialog */}
@@ -728,15 +889,9 @@ function DocumentGenerator({
         isOpen={acceptSuggestionDialogOpen}
         onClose={() => setAcceptSuggestionDialogOpen(false)}
         onConfirm={handleConfirmAcceptSuggestion}
-        title={
-          language === "de" ? "AI-Vorschlag übernehmen" : "Accept AI Suggestion"
-        }
-        message={
-          language === "de"
-            ? "Möchten Sie den aktuellen Dokumentinhalt mit dem AI-Vorschlag ersetzen? Diese Aktion kann nicht rückgängig gemacht werden (bis Sie speichern)."
-            : "Do you want to replace the current document content with the AI suggestion? This action cannot be undone (until you save)."
-        }
-        confirmText={language === "de" ? "Übernehmen" : "Accept"}
+        title={t("consultation.newAISuggestion")}
+        message={t("consultation.suggestionReplaceWarning")}
+        confirmText={t("consultation.accept")}
       />
     </div>
   );

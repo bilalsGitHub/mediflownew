@@ -82,11 +82,12 @@ function Section({
   }
 
   return (
-    <div className="flex items-start gap-4 mb-6">
+    <div id={`soap-section-${fieldName || label.toLowerCase().replace(/\s+/g, '-')}`} className="flex items-start gap-4 mb-6">
       <div className="w-48 font-bold text-sm flex-shrink-0">{label}</div>
       <div className="flex-1 relative">
         {editable ? (
           <textarea
+            id={`soap-textarea-${fieldName || label.toLowerCase().replace(/\s+/g, '-')}`}
             ref={textareaRef}
             value={value ?? ""}
             onChange={(e) => onChange?.(e.target.value)}
@@ -226,7 +227,7 @@ function SOAPNote({
 
   if (template === "kurzdokumentation") {
     return (
-      <>
+      <div id="soap-note" data-template="kurzdokumentation">
         <Section
           label="Anamnese"
           value={values.anamnese}
@@ -266,12 +267,12 @@ function SOAPNote({
           onAddOrAdjust={onAddOrAdjust}
           onCopy={handleCopy}
         />
-      </>
+      </div>
     );
   }
 
   return (
-    <>
+    <div id="soap-note" data-template="dokumentation">
       <Section
         label="Kontaktgrund"
         value={values.kontaktgrund}
@@ -339,8 +340,9 @@ function SOAPNote({
       />
 
       {/* Save Button */}
-      <div className="mt-6 flex justify-center">
+      <div id="soap-note-save-button" className="mt-6 flex justify-center">
         <button
+          id="soap-note-save"
           onClick={handleSave}
           className={`px-6 py-2 rounded-lg font-medium transition-colors ${
             isDark
@@ -350,7 +352,7 @@ function SOAPNote({
           Speichern
         </button>
       </div>
-    </>
+    </div>
   );
 }
 
