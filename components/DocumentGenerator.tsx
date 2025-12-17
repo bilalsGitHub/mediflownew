@@ -266,8 +266,16 @@ function DocumentGenerator({
     }
   };
 
-  // Update text when document changes
+  // Update text when document changes (but not when saving)
+  const isSavingRef = useRef(false);
+
   useEffect(() => {
+    // Don't update if we're in the middle of saving
+    if (isSavingRef.current) {
+      isSavingRef.current = false;
+      return;
+    }
+
     if (currentDocument) {
       setDocumentText(documentToText(currentDocument.content));
       setIsCreatingNew(false);
@@ -401,16 +409,24 @@ function DocumentGenerator({
     const now = new Date().toISOString();
 
     if (currentDocument) {
-      // Update existing
+      // Update existing - keep document open
+      isSavingRef.current = true;
       const updated: SavedDocument = {
         ...currentDocument,
         content,
         updatedAt: now,
+        title:
+          documentText.substring(0, 50) +
+          (documentText.length > 50 ? "..." : ""),
       };
       onSave(updated);
+      // Keep the document selected and open
+      setSelectedDocumentId(currentDocument.id);
+      setIsCreatingNew(false);
       showSuccess(t("consultation.documentUpdated"));
     } else {
-      // Create new
+      // Create new - open the newly created document
+      isSavingRef.current = true;
       const newDoc: SavedDocument = {
         id: Date.now().toString(),
         type: activeDocType,
@@ -424,6 +440,7 @@ function DocumentGenerator({
       onSave(newDoc);
       setSelectedDocumentId(newDoc.id);
       setIsCreatingNew(false);
+      setShowList(false); // Keep list closed to show the document
       showSuccess(t("consultation.documentSaved"));
     }
   };
