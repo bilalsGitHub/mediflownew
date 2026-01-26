@@ -887,42 +887,13 @@ export default function NewConsultationPage() {
           )}
 
           {step === "recording" && (
-            <div className="bg-theme-card rounded-lg shadow-sm border border-theme-border">
-              <div className="flex flex-col items-center justify-center min-h-[500px] p-6">
-                {/* Microphone Icon */}
-                <div className="mb-6 text-theme-text-secondary opacity-20">
-                  <Mic className="w-20 h-20" />
-                </div>
-                
-                {/* Start Label */}
-                <p
-                  className={`text-sm font-medium mb-8 ${
-                    isDark ? "text-gray-400" : "text-theme-text-secondary"
-                  }`}>
-                  {t("consultation.start") || "Start"}
-                </p>
-                
-                {/* Recording Button - Centered */}
-                <div className="mb-8">
-                  <RecordingButton
-                    onRecordingComplete={handleRecordingComplete}
-                    onRecordingStart={handleRecordingStart}
-                    onReset={handleReset}
-                    disabled={isProcessing}
-                  />
-                </div>
-                
-                {/* Instruction Text */}
-                <p
-                  className={`text-center max-w-md text-sm ${
-                    isDark
-                      ? "text-theme-text-secondary"
-                      : "text-theme-text-secondary"
-                  }`}>
-                  {t("consultation.startRecordingHint") ||
-                    "Um eine neue Konsultation zu starten, tippen Sie auf die Aufnahme-Schaltfläche"}
-                </p>
-              </div>
+            <div className="bg-theme-card rounded-lg shadow-sm border border-theme-border overflow-hidden">
+              <RecordingButton
+                onRecordingComplete={handleRecordingComplete}
+                onRecordingStart={handleRecordingStart}
+                onReset={handleReset}
+                disabled={isProcessing}
+              />
             </div>
           )}
 

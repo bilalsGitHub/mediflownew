@@ -151,117 +151,115 @@ export default function RecordingButton({
   };
 
   return (
-    <div className="relative flex flex-col items-center gap-8 py-8">
-      {/* Cancel Button - Top Right */}
+    <div className="relative w-full min-h-[400px] flex items-center justify-center">
+      {/* Timer - Top Right Corner */}
+      {isRecording && (
+        <div className="absolute top-8 right-8 flex flex-col items-end gap-2">
+          <div className="text-4xl font-mono font-bold text-theme-text tracking-tight">
+            {formatTime(recordingTime)}
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+            <p className="text-xs text-theme-text-secondary">
+              {isPaused ? t("recording.paused") : t("recording.recording")}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Cancel Button - Top Right (below timer) */}
       {isRecording && (
         <button
           onClick={handleReset}
-          className="absolute top-0 right-0 p-2 text-theme-text-secondary hover:text-theme-text transition-colors"
+          className="absolute top-24 right-8 p-2 text-theme-text-secondary hover:text-theme-danger transition-colors"
           title={t("recording.stop") || "Kaydı iptal et"}>
           <X className="w-5 h-5" />
         </button>
       )}
 
-      {/* TOP SECTION: Status & Timer - Main Focus */}
-      <div className="flex flex-col items-center gap-3">
-        {isRecording ? (
-          <>
-            {/* Large Timer - Main Focus */}
-            <div className="text-6xl font-mono font-bold text-theme-text tracking-tight">
-              {formatTime(recordingTime)}
-            </div>
-            {/* Simple Status Indicator */}
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-              <p className="text-sm text-theme-text-secondary">
-                {isPaused ? t("recording.paused") : t("recording.recording")}
-              </p>
-            </div>
-          </>
-        ) : (
-          <p className="text-sm text-theme-text-secondary cursor-pointer">
-            {t("recording.activateMicrophone")}
-          </p>
-        )}
-      </div>
-
-      {/* MIDDLE SECTION: Main Record Button - Simplified */}
+      {/* CENTER: Main Record Button */}
       <div className="relative flex items-center justify-center">
-        {/* Single subtle ring when recording */}
-        {isRecording && !isPaused && (
-          <div className="absolute w-16 h-16 bg-red-500 rounded-full opacity-20 animate-ping"></div>
+        {/* Pulse animation when NOT recording */}
+        {!isRecording && (
+          <>
+            <div className="absolute w-32 h-32 bg-theme-primary rounded-full opacity-20 animate-ping"></div>
+            <div className="absolute w-28 h-28 bg-theme-primary rounded-full opacity-30 animate-pulse"></div>
+          </>
         )}
         
-        {/* Minimal sound wave - only when recording */}
+        {/* Pulse animation when recording */}
         {isRecording && !isPaused && (
-          <div className="absolute flex items-center gap-0.5 -left-12">
-            {[0, 1, 2].map((i) => (
-              <div
-                key={i}
-                className="w-0.5 bg-red-500 rounded-full animate-sound-wave"
-                style={{
-                  height: `${6 + i * 2}px`,
-                  animationDelay: `${i * 0.15}s`,
-                }}
-              />
-            ))}
-          </div>
+          <div className="absolute w-32 h-32 bg-red-500 rounded-full opacity-20 animate-ping"></div>
+        )}
+        
+        {/* Sound waves when recording */}
+        {isRecording && !isPaused && (
+          <>
+            <div className="absolute flex items-center gap-0.5 -left-16">
+              {[0, 1, 2].map((i) => (
+                <div
+                  key={i}
+                  className="w-1 bg-red-500 rounded-full animate-sound-wave opacity-60"
+                  style={{
+                    height: `${8 + i * 4}px`,
+                    animationDelay: `${i * 0.15}s`,
+                  }}
+                />
+              ))}
+            </div>
+            <div className="absolute flex items-center gap-0.5 -right-16">
+              {[0, 1, 2].map((i) => (
+                <div
+                  key={i}
+                  className="w-1 bg-red-500 rounded-full animate-sound-wave opacity-60"
+                  style={{
+                    height: `${8 + i * 4}px`,
+                    animationDelay: `${i * 0.15}s`,
+                  }}
+                />
+              ))}
+            </div>
+          </>
         )}
 
         <button
           onClick={isRecording ? stopRecording : startRecording}
           disabled={disabled}
           className={`
-            relative z-10 w-14 h-14 rounded-full flex items-center justify-center
-            transition-all duration-200
+            relative z-10 rounded-full flex items-center justify-center
+            transition-all duration-300
             ${
               isRecording
-                ? "bg-theme-danger hover:bg-theme-danger-hover"
-                : "bg-theme-primary hover:bg-theme-primary-hover"
+                ? "w-20 h-20 bg-theme-danger hover:bg-theme-danger-hover"
+                : "w-24 h-24 bg-theme-primary hover:bg-theme-primary-hover hover:scale-105 animate-gentle-pulse"
             }
             ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
-            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-theme-primary
-            shadow-lg
+            focus:outline-none focus:ring-4 focus:ring-theme-primary/30
+            shadow-2xl
           `}
           aria-label={isRecording ? "Kaydı durdur" : "Kaydı başlat"}>
           {isRecording ? (
-            <Square className="w-5 h-5 text-white" fill="white" />
+            <Square className="w-8 h-8 text-white" fill="white" />
           ) : (
-            <Mic className="w-5 h-5 text-white" />
+            <Mic className="w-10 h-10 text-white" />
           )}
         </button>
-
-        {/* Minimal sound wave on the right */}
-        {isRecording && !isPaused && (
-          <div className="absolute flex items-center gap-0.5 -right-12">
-            {[0, 1, 2].map((i) => (
-              <div
-                key={i}
-                className="w-0.5 bg-red-500 rounded-full animate-sound-wave"
-                style={{
-                  height: `${6 + i * 2}px`,
-                  animationDelay: `${i * 0.15}s`,
-                }}
-              />
-            ))}
-          </div>
-        )}
       </div>
 
-      {/* BOTTOM SECTION: Controls - Subtle */}
+      {/* BOTTOM: Pause/Resume Control */}
       {isRecording && (
-        <div className="flex items-center gap-3">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
           <button
             onClick={isPaused ? resumeRecording : pauseRecording}
-            className="px-3 py-1.5 text-xs text-theme-text-secondary hover:text-theme-text transition-colors flex items-center gap-1.5">
+            className="px-4 py-2 text-sm text-theme-text-secondary hover:text-theme-text bg-theme-card hover:bg-theme-primary-light border border-theme-border rounded-full transition-all flex items-center gap-2 shadow-md">
             {isPaused ? (
               <>
-                <Play className="w-3.5 h-3.5" />
+                <Play className="w-4 h-4" />
                 <span>{t("recording.resume")}</span>
               </>
             ) : (
               <>
-                <Pause className="w-3.5 h-3.5" />
+                <Pause className="w-4 h-4" />
                 <span>{t("recording.pause")}</span>
               </>
             )}
