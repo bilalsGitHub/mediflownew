@@ -3,25 +3,60 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* ========================================
+     6 BASE COLORS × 6 THEMES = 36 TOTAL
+     These will be dynamically set by ThemeContext
+     ======================================== */
   
-  /* Theme variables - will be set by ThemeContext */
-  --theme-background: #F9FAFB;
-  --theme-primary: #2F80ED;
-  --theme-primary-light: #EAF2FD;
-  --theme-primary-dark: #1F3A5F;
-  --theme-text-dark: #1F2933;
-  --theme-text-secondary: #6B7280;
-  --theme-accent: #2F80ED;
-  --theme-accent-light: #EAF2FD;
-  --theme-danger: #D9534F;
-  --theme-card-bg: #FFFFFF;
-  --theme-border: #E5E7EB;
+  /* Base Layout Colors */
+  --theme-background: #FFFFFF;
+  --theme-text: #0F172A;
+  --theme-text-secondary: #64748B;
+  --theme-card: #F8FAFC;
+  --theme-border: #E2E8F0;
+  
+  /* 1. PRIMARY - Main Actions (Save, Submit) */
+  --theme-primary: #16A34A;
+  --theme-primary-hover: #15803D;
+  --theme-primary-light: #DCFCE7;
+  
+  /* 2. SECONDARY - AI/Premium Features */
+  --theme-secondary: #7C3AED;
+  --theme-secondary-hover: #6D28D9;
+  --theme-secondary-light: #F5F3FF;
+  
+  /* 3. ACCENT - Highlights & Emphasis */
+  --theme-accent: #3B82F6;
+  --theme-accent-hover: #2563EB;
+  --theme-accent-light: #DBEAFE;
+  
+  /* 4. SUCCESS - Success States */
+  --theme-success: #16A34A;
+  --theme-success-hover: #15803D;
+  --theme-success-light: #DCFCE7;
+  
+  /* 5. WARNING - Warning States */
+  --theme-warning: #F59E0B;
+  --theme-warning-hover: #D97706;
+  --theme-warning-light: #FEF3C7;
+  
+  /* 6. DANGER - Danger Actions */
+  --theme-danger: #DC2626;
+  --theme-danger-hover: #B91C1C;
+  --theme-danger-light: #FEE2E2;
+  
+  /* Neutral - Gray Tones */
+  --theme-neutral: #6B7280;
+  --theme-neutral-hover: #0F172A;
+  
+  /* Legacy Compatibility (Deprecated) */
+  --theme-primary-dark: #15803D;
+  --theme-card-bg: #F8FAFC;
+  --theme-gray-bg: #F8FAFC;
 }
 
 body {
-  color: var(--theme-text-dark);
+  color: var(--theme-text);
   background: var(--theme-background);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',

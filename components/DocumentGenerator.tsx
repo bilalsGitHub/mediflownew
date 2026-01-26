@@ -684,12 +684,12 @@ function DocumentGenerator({
             title={t("consultation.delete")}>
             <Trash2 className="w-4 h-4" />
           </button>
-          {/* AI generieren Button */}
+          {/* AI generieren Button - PURPLE SECONDARY */}
           <button
             id="document-ai-generate"
             onClick={handleGenerateDocument}
             disabled={isGenerating}
-            className="flex items-center gap-2 px-4 py-2 text-sm bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            className="flex items-center gap-2 px-3.5 py-1.5 text-sm bg-theme-secondary hover:bg-theme-secondary-hover text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm">
             {isGenerating ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -705,7 +705,7 @@ function DocumentGenerator({
           <button
             id="document-save"
             onClick={handleSaveDocument}
-            className="px-4 py-2 text-sm bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors">
+            className="px-6 py-2.5 text-sm bg-theme-primary hover:bg-theme-primary-hover text-white rounded-lg transition-all shadow-sm hover:shadow-md font-medium">
             {currentDocument
               ? t("consultation.update")
               : t("consultation.save")}

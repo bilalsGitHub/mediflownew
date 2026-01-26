@@ -140,7 +140,7 @@ export default function DashboardPage() {
               {user && (
                 <button
                   onClick={() => router.push('/new-consultation')}
-                  className="flex items-center gap-2 px-4 py-2 bg-theme-primary hover:bg-theme-primary-dark text-white rounded-lg transition-all text-sm font-semibold shadow-md hover:shadow-lg"
+                  className="flex items-center gap-2 px-4 py-2.5 bg-theme-primary hover:bg-theme-primary-hover text-white rounded-lg transition-all text-sm font-semibold shadow-md hover:shadow-lg"
                 >
                   <Plus className="w-4 h-4" />
                   <span className="hidden sm:inline">{t('dashboard.newConsultation')}</span>
@@ -253,11 +253,11 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        {/* CTA Button - Mavi (ana ürün rengi) */}
+        {/* CTA Button - GREEN PRIMARY */}
         <div className="flex justify-center mb-12">
           <button
             onClick={() => router.push(user ? '/new-consultation' : '/login')}
-            className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg text-lg font-semibold shadow-xl shadow-blue-500/30 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-2xl hover:shadow-blue-500/40 flex items-center gap-2"
+            className="px-8 py-4 bg-theme-primary hover:bg-theme-primary-hover text-white rounded-lg text-lg font-semibold shadow-xl shadow-green-500/30 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-2xl hover:shadow-green-500/40 flex items-center gap-2"
           >
             <Mic className="w-5 h-5" />
             {user ? t('dashboard.getStarted') : t('auth.login')}

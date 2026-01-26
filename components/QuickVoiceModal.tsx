@@ -247,24 +247,13 @@ export default function QuickVoiceModal({ isOpen, onClose }: QuickVoiceModalProp
                 </h3>
                 <button
                   onClick={handleCopy}
-                  className={`flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg transition-colors ${
-                    copied
-                      ? 'bg-theme-accent text-white'
-                      : isDark
-                      ? 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-                      : 'bg-theme-primary-light text-theme-text hover:bg-theme-primary-light/80'
-                  }`}
+                  className="p-2 text-theme-neutral hover:text-theme-neutral-hover hover:bg-transparent rounded-lg transition-colors"
+                  title={t('common.copy') || 'Kopieren'}
                 >
                   {copied ? (
-                    <>
-                      <Check className="w-4 h-4" />
-                      <span>{t('common.copied') || 'Kopiert'}</span>
-                    </>
+                    <Check className="w-5 h-5 text-theme-success" />
                   ) : (
-                    <>
-                      <Copy className="w-4 h-4" />
-                      <span>{t('common.copy') || 'Kopieren'}</span>
-                    </>
+                    <Copy className="w-5 h-5" />
                   )}
                 </button>
               </div>
@@ -276,21 +265,13 @@ export default function QuickVoiceModal({ isOpen, onClose }: QuickVoiceModalProp
               <div className="flex gap-3">
                 <button
                   onClick={handleReset}
-                  className={`flex-1 px-4 py-2 rounded-lg transition-colors ${
-                    isDark
-                      ? 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-                      : 'bg-theme-primary-light text-theme-text hover:bg-theme-primary-light/80'
-                  }`}
+                  className="flex-1 px-4 py-2 bg-theme-secondary-light text-theme-secondary border border-theme-secondary-light rounded-lg hover:bg-theme-secondary-light/80 transition-colors"
                 >
                   {t('quickVoice.newRecording') || 'Neue Aufnahme'}
                 </button>
                 <button
                   onClick={onClose}
-                  className={`flex-1 px-4 py-2 rounded-lg transition-colors ${
-                    isDark
-                      ? 'bg-theme-primary text-white hover:bg-theme-primary-dark'
-                      : 'bg-theme-primary text-white hover:bg-theme-primary-dark'
-                  }`}
+                  className="flex-1 px-4 py-2.5 bg-theme-primary text-white rounded-lg hover:bg-theme-primary-hover transition-all shadow-sm hover:shadow-md font-medium"
                 >
                   {t('common.close') || 'Schließen'}
                 </button>

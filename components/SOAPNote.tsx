@@ -111,12 +111,8 @@ function Section({
               <button
                 onClick={onDelete}
                 title="Sil"
-                className="absolute top-2 right-2 opacity-30 hover:opacity-60 transition-opacity">
-                <X
-                  className={`w-4 h-4 ${
-                    isDark ? "text-gray-400" : "text-gray-500"
-                  } hover:text-red-500`}
-                />
+                className="absolute top-2 right-2 opacity-0 hover:opacity-100 transition-opacity">
+                <X className="w-4 h-4 text-theme-neutral hover:text-theme-danger" />
               </button>
             )}
             {/* Kopyala ve Sesle Ekle - Sağ alt */}
@@ -132,24 +128,16 @@ function Section({
                       )
                     }
                     title="Sesle ekle"
-                    className="opacity-40 hover:opacity-100 active:opacity-100 transition-all hover:glow-purple active:glow-purple">
-                    <Mic
-                      className={`w-4 h-4 ${
-                        isDark ? "text-purple-400" : "text-purple-500"
-                      }`}
-                    />
+                    className="opacity-0 hover:opacity-100 transition-opacity">
+                    <Mic className="w-4 h-4 text-theme-neutral hover:text-theme-secondary" />
                   </button>
                 )}
                 {/* Kopyala - Sağda */}
                 <button
                   onClick={() => onCopy(value!)}
                   title="Kopyala"
-                  className="opacity-35 hover:opacity-70 transition-opacity">
-                  <Copy
-                    className={`w-4 h-4 ${
-                      isDark ? "text-gray-400" : "text-gray-500"
-                    } hover:text-theme-primary`}
-                  />
+                  className="opacity-0 hover:opacity-100 transition-opacity">
+                  <Copy className="w-4 h-4 text-theme-neutral hover:text-theme-neutral-hover" />
                 </button>
               </div>
             )}
@@ -339,16 +327,12 @@ function SOAPNote({
         onCopy={handleCopy}
       />
 
-      {/* Save Button */}
+      {/* Save Button - PRIMARY */}
       <div id="soap-note-save-button" className="mt-6 flex justify-center">
         <button
           id="soap-note-save"
           onClick={handleSave}
-          className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-            isDark
-              ? "bg-theme-primary text-white hover:bg-blue-600"
-              : "bg-theme-primary text-white hover:bg-blue-700"
-          }`}>
+          className="px-6 py-2.5 bg-theme-primary hover:bg-theme-primary-hover text-white rounded-lg font-medium transition-all shadow-sm hover:shadow-md">
           Speichern
         </button>
       </div>

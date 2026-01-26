@@ -216,8 +216,8 @@ export default function RecordingButton({
             transition-all duration-200
             ${
               isRecording
-                ? "bg-red-500 hover:bg-red-600"
-                : "bg-theme-primary hover:bg-theme-primary-dark"
+                ? "bg-theme-danger hover:bg-theme-danger-hover"
+                : "bg-theme-primary hover:bg-theme-primary-hover"
             }
             ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
             focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-theme-primary
