@@ -10,19 +10,11 @@ import Tabs from "@/components/ui/Tabs";
 import MainLayout from "@/components/layout/MainLayout";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { storage, Consultation } from "@/lib/storage";
-<<<<<<< HEAD
 import { Loader2, FileText, MessageSquare, ClipboardList, RefreshCw } from "lucide-react";
 import StatusBadge from "@/components/ui/StatusBadge";
 import SOAPNote from "@/components/consultation/SOAPNote";
 import AnamneseSection from "@/components/consultation/AnamneseSection";
 import AddOrAdjustModal from "@/components/consultation/AddOrAdjustModal";
-=======
-import { Loader2, FileText, MessageSquare, ClipboardList, RefreshCw, Mic } from "lucide-react";
-import StatusBadge from "@/components/StatusBadge";
-import SOAPNote from "@/components/SOAPNote";
-import AnamneseSection from "@/components/AnamneseSection";
-import AddOrAdjustModal from "@/components/AddOrAdjustModal";
->>>>>>> f0897c16606d72b0f5b567e3510608a3ca956414
 import { useLanguage } from "@/lib/LanguageContext";
 import { useTheme } from "@/lib/ThemeContext";
 import { useToast } from "@/lib/ToastContext";
