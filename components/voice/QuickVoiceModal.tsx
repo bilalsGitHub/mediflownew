@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { X, Mic, Square, Copy, Check, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/lib/LanguageContext';
 import { useTheme } from '@/lib/ThemeContext';
+import { useTranscribeMutation } from '@/store/api/aiApi';
 
 interface QuickVoiceModalProps {
   isOpen: boolean;
@@ -123,6 +124,8 @@ export default function QuickVoiceModal({ isOpen, onClose }: QuickVoiceModalProp
     setCopied(false);
   };
 
+  const [transcribe] = useTranscribeMutation();
+
   const processAudio = async (blob: Blob) => {
     setIsProcessing(true);
     try {
@@ -130,22 +133,13 @@ export default function QuickVoiceModal({ isOpen, onClose }: QuickVoiceModalProp
       formData.append('audio', blob, 'recording.webm');
       formData.append('language', language);
 
-      const response = await fetch('/api/ai/transcribe', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error('Transkript oluşturulamadı');
-      }
-
-      const { transcript: newTranscript } = await response.json();
-      if (newTranscript) {
-        setTranscript(newTranscript);
+      const result = await transcribe(formData).unwrap();
+      if (result.transcript) {
+        setTranscript(result.transcript);
       }
     } catch (error: any) {
       console.error('Transcription error:', error);
-      alert('Ses işleme hatası: ' + error.message);
+      alert('Ses işleme hatası: ' + (error?.data?.error ?? error?.message ?? ''));
     } finally {
       setIsProcessing(false);
     }

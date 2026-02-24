@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/AuthContext";
 import { useLanguage } from "@/lib/LanguageContext";
 import { useTheme } from "@/lib/ThemeContext";
-import LanguageSelector from "@/components/LanguageSelector";
-import FAQSection from "@/components/FAQSection";
+import LanguageSelector from "@/components/ui/LanguageSelector";
+import FAQSection from "@/components/landing/FAQSection";
 import {
   ArrowRight,
   Mic,

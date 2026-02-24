@@ -8,32 +8,24 @@ import {
   ReactNode,
 } from "react";
 import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
 import { supabase } from "./supabase/client";
 import { User as SupabaseUser } from "@supabase/supabase-js";
+import type { User, Profile, RegisterData } from "@/store/types/auth";
+import {
+  setUser,
+  setLoading,
+  setLoggingIn,
+  setRegistering,
+  setLoginError,
+  setRegisterError,
+  logout as logoutAction,
+} from "@/store/slices/auth/authSlice";
+import { setProfile, clearUserData } from "@/store/slices/data/userDataSlice";
+import { clearConsultations } from "@/store/slices/data/consultationsSlice";
+import { clearAppointments } from "@/store/slices/data/appointmentsSlice";
 
-// Profile interface (Supabase'den gelen)
-export interface Profile {
-  id: string;
-  email: string;
-  full_name: string;
-  role: "doctor" | "patient";
-  country?: string;
-  age?: number;
-  language?: string;
-  created_at: string;
-  updated_at: string;
-}
-
-// User interface (app için)
-export interface User {
-  id: string;
-  email: string;
-  fullName: string;
-  role: "doctor" | "patient";
-  country?: string;
-  age?: number;
-  language?: string;
-}
+export type { User, Profile, RegisterData };
 
 interface AuthContextType {
   user: User | null;
@@ -43,21 +35,20 @@ interface AuthContextType {
   isLoading: boolean;
 }
 
-interface RegisterData {
-  email: string;
-  password: string;
-  fullName: string;
-  country?: string;
-  age?: number;
-  language?: string;
-}
-
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUserState] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const dispatch = useDispatch();
+
+  // Sync auth state to Redux
+  useEffect(() => {
+    dispatch(setUser(user));
+    dispatch(setProfile(user));
+    dispatch(setLoading(isLoading));
+  }, [user, isLoading, dispatch]);
 
   // Convert Supabase profile to app User
   const profileToUser = (profile: Profile): User => ({
@@ -75,22 +66,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
-        // Don't await - let it run in background
         loadUserProfile(session.user.id, session.user);
       } else {
         setIsLoading(false);
       }
     });
 
-    // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session?.user) {
-        // Don't await - let it run in background to avoid blocking auth flow
         loadUserProfile(session.user.id, session.user);
       } else {
-        setUser(null);
+        setUserState(null);
         setIsLoading(false);
       }
     });
@@ -143,7 +131,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             if (insertError) {
               console.error("Error creating profile:", insertError);
               // Even if profile creation fails, set user from metadata
-              setUser({
+              setUserState({
                 id: userId,
                 email: fallbackUser.email || "",
                 fullName: userMetadata.full_name || userMetadata.fullName || "",
@@ -153,15 +141,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 language: userMetadata.language || "de",
               });
             } else {
-              // Profile created, set user
-              setUser(profileToUser(newProfile as Profile));
+              setUserState(profileToUser(newProfile as Profile));
             }
           } catch (createError) {
             console.error("Error creating profile from metadata:", createError);
             // Fallback: set user from metadata anyway
             if (fallbackUser) {
               const userMetadata = fallbackUser.user_metadata || {};
-              setUser({
+              setUserState({
                 id: userId,
                 email: fallbackUser.email || "",
                 fullName: userMetadata.full_name || userMetadata.fullName || "",
@@ -173,10 +160,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }
           }
         } else {
-          // Other error or no fallback user - set user from metadata if available
           if (fallbackUser) {
             const userMetadata = fallbackUser.user_metadata || {};
-            setUser({
+            setUserState({
               id: userId,
               email: fallbackUser.email || "",
               fullName: userMetadata.full_name || userMetadata.fullName || "",
@@ -192,13 +178,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (profile) {
         console.log("Profile loaded:", profile);
-        setUser(profileToUser(profile as Profile));
+        setUserState(profileToUser(profile as Profile));
       } else {
-        console.warn("No profile data returned");
-        // Fallback to metadata if available
         if (fallbackUser) {
           const userMetadata = fallbackUser.user_metadata || {};
-          setUser({
+          setUserState({
             id: userId,
             email: fallbackUser.email || "",
             fullName: userMetadata.full_name || userMetadata.fullName || "",
@@ -211,10 +195,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     } catch (error) {
       console.error("Error loading profile:", error);
-      // Fallback to metadata if available
       if (fallbackUser) {
         const userMetadata = fallbackUser.user_metadata || {};
-        setUser({
+        setUserState({
           id: userId,
           email: fallbackUser.email || "",
           fullName: userMetadata.full_name || userMetadata.fullName || "",
@@ -230,27 +213,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const login = async (email: string, password: string): Promise<boolean> => {
+    dispatch(setLoggingIn(true));
     try {
-      console.log("Attempting login for:", email);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
-        console.error("Login error:", error);
+        dispatch(setLoginError(error.message));
         return false;
       }
 
       if (data.user) {
-        console.log(
-          "Login successful, setting user optimistically:",
-          data.user.id
-        );
-
-        // Optimistically set user from metadata to unblock UI immediately
         const userMetadata = data.user.user_metadata || {};
-        setUser({
+        setUserState({
           id: data.user.id,
           email: data.user.email || "",
           fullName: userMetadata.full_name || userMetadata.fullName || "",
@@ -259,14 +236,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           age: userMetadata.age || undefined,
           language: userMetadata.language || "de",
         });
-
+        dispatch(setLoggingIn(false));
         return true;
       }
 
-      console.warn("Login succeeded but no user data returned");
+      dispatch(setLoginError("No user data returned"));
       return false;
     } catch (error) {
       console.error("Login error:", error);
+      dispatch(setLoginError(error instanceof Error ? error.message : "Login failed"));
       return false;
     }
   };
@@ -274,7 +252,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = async () => {
     try {
       await supabase.auth.signOut();
-      setUser(null);
+      setUserState(null);
+      dispatch(logoutAction());
+      dispatch(clearUserData());
+      dispatch(clearConsultations());
+      dispatch(clearAppointments());
       router.push("/login");
     } catch (error) {
       console.error("Logout error:", error);
@@ -282,8 +264,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const register = async (userData: RegisterData): Promise<boolean> => {
+    dispatch(setRegistering(true));
     try {
-      // Sign up with Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: userData.email,
         password: userData.password,
@@ -299,7 +281,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       if (authError) {
-        console.error("Registration error:", authError);
+        dispatch(setRegisterError(authError.message));
         return false;
       }
 
@@ -320,14 +302,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           // Continue anyway, profile was created by trigger
         }
 
-        // Auto login after registration
         await loadUserProfile(authData.user.id, authData.user);
+        dispatch(setRegistering(false));
         return true;
       }
 
+      dispatch(setRegisterError("No user data returned"));
       return false;
     } catch (error) {
       console.error("Registration error:", error);
+      dispatch(setRegisterError(error instanceof Error ? error.message : "Registration failed"));
       return false;
     }
   };

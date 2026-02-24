@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import RecordingButton from './RecordingButton';
+import RecordingButton from '@/components/voice/RecordingButton';
 import { Copy, Check, Mic, FileText, Loader2, X } from 'lucide-react';
 import { useLanguage } from '@/lib/LanguageContext';
-
-type RewriteStyle = 'shorter' | 'detailed' | 'clearer' | 'professional' | 'structured' | 'summary';
+import { useTranscribeMutation, useRewriteTextMutation } from '@/store/api/aiApi';
+import type { RewriteStyle } from '@/store/types/api';
 
 const REWRITE_OPTIONS: Array<{ id: RewriteStyle; label: string; description: string }> = [
   { id: 'shorter', label: 'Daha Kısa', description: 'Öz ve kısa hale getir' },
@@ -30,6 +30,9 @@ export default function DoctorNoteCreator({ initialText = '', onSave, onCancel }
   const [isRewriting, setIsRewriting] = useState(false);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useLanguage();
+
+  const [transcribe] = useTranscribeMutation();
 
   const handleRecordingComplete = async (blob: Blob) => {
     setIsProcessing(true);
@@ -39,18 +42,9 @@ export default function DoctorNoteCreator({ initialText = '', onSave, onCancel }
       const formData = new FormData();
       formData.append('audio', blob, 'recording.webm');
 
-      const transcribeResponse = await fetch('/api/ai/transcribe', {
-        method: 'POST',
-        body: formData,
-      });
+      const result = await transcribe(formData).unwrap();
+      const newTranscript = result.transcript;
 
-      if (!transcribeResponse.ok) {
-        const errorData = await transcribeResponse.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Transkript oluşturulamadı');
-      }
-
-      const { transcript: newTranscript } = await transcribeResponse.json();
-      
       if (!newTranscript || newTranscript.trim().length === 0) {
         throw new Error('Transkript boş geldi. Lütfen ses kaydını kontrol edin.');
       }
@@ -60,37 +54,26 @@ export default function DoctorNoteCreator({ initialText = '', onSave, onCancel }
       setStep('editing');
     } catch (err: any) {
       console.error('Processing error:', err);
-      setError(err.message || 'Bir hata oluştu');
+      setError(err?.data?.error ?? err?.message ?? 'Bir hata oluştu');
     } finally {
       setIsProcessing(false);
     }
   };
 
+  const [rewriteText] = useRewriteTextMutation();
+
   const handleRewrite = async (style: RewriteStyle) => {
     if (!editedText) return;
-    
+
     setIsRewriting(true);
     setError(null);
 
     try {
-      const response = await fetch('/api/ai/rewrite-text', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ text: editedText, style }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Metin düzenlenemedi');
-      }
-
-      const { rewrittenText } = await response.json();
-      setEditedText(rewrittenText);
+      const result = await rewriteText({ text: editedText, style }).unwrap();
+      setEditedText(result.rewrittenText);
     } catch (err: any) {
       console.error('Rewrite error:', err);
-      setError(err.message || 'Metin düzenlenemedi');
+      setError(err?.data?.error ?? err?.message ?? 'Metin düzenlenemedi');
     } finally {
       setIsRewriting(false);
     }

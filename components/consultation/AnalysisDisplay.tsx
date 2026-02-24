@@ -2,7 +2,7 @@
 
 import { Edit2, Check, X, RotateCcw, Mic } from "lucide-react";
 import { useState } from "react";
-import DoctorNoteCreator from "./DoctorNoteCreator";
+import DoctorNoteCreator from "@/components/doctor-notes/DoctorNoteCreator";
 import { useTheme } from "@/lib/ThemeContext";
 import { useLanguage } from "@/lib/LanguageContext";
 

@@ -5,7 +5,7 @@ import { X, ChevronLeft, ChevronRight, Plus, Edit2, Trash2, Clock } from 'lucide
 import { useLanguage } from '@/lib/LanguageContext';
 import { useTheme } from '@/lib/ThemeContext';
 import { appointmentStorage, Appointment } from '@/lib/storage';
-import ConfirmDialog from './ConfirmDialog';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 interface AppointmentCalendarModalProps {
   isOpen: boolean;

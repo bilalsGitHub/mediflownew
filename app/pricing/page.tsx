@@ -7,7 +7,7 @@ import { useAuth } from "@/lib/AuthContext";
 import { useRouter } from "next/navigation";
 import { Check, Star, ArrowRight } from "lucide-react";
 import Link from "next/link";
-import LanguageSelector from "@/components/LanguageSelector";
+import LanguageSelector from "@/components/ui/LanguageSelector";
 
 export default function PricingPage() {
   const { t } = useLanguage();

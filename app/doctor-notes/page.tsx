@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import RecordingButton from '@/components/RecordingButton';
+import RecordingButton from '@/components/voice/RecordingButton';
 import MainLayout from '@/components/layout/MainLayout';
 import { Copy, Check, Save, Loader2, Mic, FileText } from 'lucide-react';
 import { useTheme } from '@/lib/ThemeContext';

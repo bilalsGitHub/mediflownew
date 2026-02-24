@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import RecordingButton from './RecordingButton';
+import RecordingButton from '@/components/voice/RecordingButton';
 import { X, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/lib/LanguageContext';
 import { useTheme } from '@/lib/ThemeContext';

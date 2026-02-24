@@ -9,7 +9,7 @@ import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/AuthContext";
 import { useTheme } from "@/lib/ThemeContext";
 import { useLanguage } from "@/lib/LanguageContext";
-import ConfirmDialog from "@/components/ConfirmDialog";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 
 interface SidebarProps {
   isOpen: boolean;

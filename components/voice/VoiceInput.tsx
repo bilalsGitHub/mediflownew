@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { Mic, MicOff, Loader2 } from "lucide-react";
 import { useLanguage } from "@/lib/LanguageContext";
 import { useToast } from "@/lib/ToastContext";
+import { useTranscribeMutation } from "@/store/api/aiApi";
 
 interface VoiceInputProps {
   onTranscript: (text: string) => void;
@@ -198,29 +199,22 @@ export default function VoiceInput({
     };
   }, []);
 
+  const [transcribe] = useTranscribeMutation();
+
   const processAudio = async (blob: Blob) => {
     setIsProcessing(true);
     try {
-      // Convert to MP3 or WAV for OpenAI Whisper
       const formData = new FormData();
       formData.append("audio", blob, "recording.webm");
+      formData.append("language", language);
 
-      const response = await fetch("/api/ai/transcribe", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("Transcription failed");
-      }
-
-      const { transcript } = await response.json();
-      if (transcript) {
-        onTranscript(transcript);
+      const result = await transcribe(formData).unwrap();
+      if (result.transcript) {
+        onTranscript(result.transcript);
       }
     } catch (error: any) {
       console.error("Transcription error:", error);
-      showError(t("voiceInput.processingError") + " " + error.message);
+      showError(t("voiceInput.processingError") + " " + (error?.data?.error ?? error?.message ?? ""));
     } finally {
       setIsProcessing(false);
     }

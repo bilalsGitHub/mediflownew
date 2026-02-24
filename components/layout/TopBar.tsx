@@ -17,9 +17,9 @@ import {
 import { useLanguage } from "@/lib/LanguageContext";
 import { useAuth } from "@/lib/AuthContext";
 import { Language } from "@/lib/translations";
-import ThemeSelector from "@/components/ThemeSelector";
-import QuickVoiceModal from "@/components/QuickVoiceModal";
-import CalendarModal from "@/components/CalendarModal";
+import ThemeSelector from "@/components/ui/ThemeSelector";
+import QuickVoiceModal from "@/components/voice/QuickVoiceModal";
+import CalendarModal from "@/components/calendar/CalendarModal";
 
 interface TopBarProps {
   onMenuClick: () => void;

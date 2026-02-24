@@ -13,7 +13,7 @@ import {
   X,
   Check,
 } from "lucide-react";
-import VoiceInput from "./VoiceInput";
+import VoiceInput from "@/components/voice/VoiceInput";
 import {
   PatientMessage,
   ReferralReason,
@@ -25,7 +25,7 @@ import { useTheme } from "@/lib/ThemeContext";
 import { useToast } from "@/lib/ToastContext";
 import { useLanguage } from "@/lib/LanguageContext";
 import { useAuth } from "@/lib/AuthContext";
-import ConfirmDialog from "./ConfirmDialog";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 
 type DocumentType = "patientMessage" | "referralReason" | "referralResponse";
 

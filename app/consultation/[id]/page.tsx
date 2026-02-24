@@ -13,15 +13,15 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { storage, Consultation } from "@/lib/storage";
-import AnalysisDisplay from "@/components/AnalysisDisplay";
-import TranscriptDisplay from "@/components/TranscriptDisplay";
-import Tabs from "@/components/Tabs";
+import AnalysisDisplay from "@/components/consultation/AnalysisDisplay";
+import TranscriptDisplay from "@/components/consultation/TranscriptDisplay";
+import Tabs from "@/components/ui/Tabs";
 import { FileText, MessageSquare } from "lucide-react";
-import StatusBadge from "@/components/StatusBadge";
-import SOAPNote from "@/components/SOAPNote";
-import AddOrAdjustModal from "@/components/AddOrAdjustModal";
-import DocumentGenerator from "@/components/DocumentGenerator";
-import ConfirmDialog from "@/components/ConfirmDialog";
+import StatusBadge from "@/components/ui/StatusBadge";
+import SOAPNote from "@/components/consultation/SOAPNote";
+import AddOrAdjustModal from "@/components/consultation/AddOrAdjustModal";
+import DocumentGenerator from "@/components/consultation/DocumentGenerator";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { SavedDocument } from "@/lib/storage";
 import { useLanguage } from "@/lib/LanguageContext";
 import { useToast } from "@/lib/ToastContext";

@@ -20,8 +20,9 @@ import { useAuth } from '@/lib/AuthContext';
 import { useLanguage } from '@/lib/LanguageContext';
 import { useTheme } from '@/lib/ThemeContext';
 import { Language } from '@/lib/translations';
-import ThemeSelector from '@/components/ThemeSelector';
-import FAQSection from '@/components/FAQSection';
+import ThemeSelector from '@/components/ui/ThemeSelector';
+import FAQSection from '@/components/landing/FAQSection';
+import ApiLogPanel from '@/components/ui/ApiLogPanel';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -315,6 +316,11 @@ export default function DashboardPage() {
               {t('dashboard.totalTimeSavedDesc')}
             </p>
           </div>
+        </div>
+
+        {/* API istekleri – tüm GET/POST burada listelenir */}
+        <div className="max-w-2xl mx-auto mb-8">
+          <ApiLogPanel />
         </div>
 
         {/* FAQ Section */}
