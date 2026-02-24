@@ -117,12 +117,12 @@ export default function BottomToolbar({
 
         {/* Right Side - Action Buttons */}
         <div className="flex items-center gap-3">
-          {/* Regenerate Button */}
+          {/* Regenerate Button - Icon only, gray */}
           {onRegenerate && (
             <button
               onClick={onRegenerate}
               disabled={isRegenerating}
-              className="p-2 text-theme-text-secondary hover:text-theme-text hover:bg-theme-primary-light rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-2 text-[#6B7280] hover:text-[#0F172A] hover:bg-transparent rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               title={t('consultation.regenerate')}
             >
               {isRegenerating ? (
@@ -133,35 +133,35 @@ export default function BottomToolbar({
             </button>
           )}
 
-          {/* Add Entry Button */}
+          {/* Add Entry Button - Soft Purple / Ghost */}
           {onAddEntry && (
             <button
               onClick={onAddEntry}
-              className="flex items-center gap-2 px-4 py-2 text-sm text-theme-text hover:bg-theme-primary-light rounded-lg transition-colors"
+              className="flex items-center gap-2 px-4 py-2 text-sm bg-[#F5F3FF] text-[#7C3AED] border border-[#DDD6FE] hover:bg-[#EDE9FE] rounded-lg transition-colors"
             >
               <Plus className="w-4 h-4" />
               <span>{t('consultation.addEntry')}</span>
             </button>
           )}
 
-          {/* Add or Adjust Button */}
+          {/* Add or Adjust Button - PURPLE SECONDARY (smaller) */}
           {onAddOrAdjust && (
             <button
               onClick={onAddOrAdjust}
-              className="flex items-center gap-2 px-4 py-2 text-sm bg-theme-accent text-white hover:bg-theme-accent/90 rounded-lg transition-colors"
+              className="flex items-center gap-2 px-3.5 py-1.5 text-sm bg-[#7C3AED] text-white hover:bg-[#6D28D9] rounded-lg transition-colors shadow-sm"
             >
               <Mic className="w-4 h-4" />
               <span>{t('consultation.addOrAdjust')}</span>
             </button>
           )}
 
-          {/* Copy Note Button */}
+          {/* Copy Note Button - PRIMARY */}
           {onCopyNote && (
             <button
               onClick={handleCopyNote}
-              className="flex items-center gap-2 px-4 py-2 text-sm bg-theme-text text-white hover:bg-theme-text/90 rounded-lg transition-colors"
+              className="flex items-center gap-2 px-6 py-2.5 text-sm bg-theme-primary text-white hover:bg-theme-primary-hover rounded-lg transition-all shadow-sm hover:shadow-md font-medium"
             >
-              <FileText className="w-4 h-4" />
+              <Copy className="w-4 h-4" />
               <span>{t('consultation.copyNote')}</span>
             </button>
           )}

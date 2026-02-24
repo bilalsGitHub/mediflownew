@@ -35,7 +35,7 @@ export default function ThemeSelector({ isOpen, onClose }: ThemeSelectorProps) {
 
         {/* Content */}
         <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-md mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {(Object.keys(themes) as ThemeId[]).map((id) => {
               const theme = themes[id];
               const isSelected = themeId === id;
@@ -59,18 +59,37 @@ export default function ThemeSelector({ isOpen, onClose }: ThemeSelectorProps) {
                     </div>
                   )}
 
-                  {/* Theme Icon/Preview */}
-                  <div className="flex justify-center gap-2 mb-4">
+                  {/* 6 Color Preview */}
+                  <div className="grid grid-cols-3 gap-2 mb-4">
                     <div
-                      className="w-12 h-12 rounded-lg"
-                      style={{ backgroundColor: theme.colors.background }}
+                      className="h-10 rounded-md shadow-sm"
+                      style={{ backgroundColor: theme.colors.primary }}
+                      title="Primary"
                     />
                     <div
-                      className="w-12 h-12 rounded-lg border-2"
-                      style={{ 
-                        backgroundColor: theme.colors.cardBg || theme.colors.background,
-                        borderColor: theme.colors.border || theme.colors.primary
-                      }}
+                      className="h-10 rounded-md shadow-sm"
+                      style={{ backgroundColor: theme.colors.secondary }}
+                      title="Secondary"
+                    />
+                    <div
+                      className="h-10 rounded-md shadow-sm"
+                      style={{ backgroundColor: theme.colors.accent }}
+                      title="Accent"
+                    />
+                    <div
+                      className="h-10 rounded-md shadow-sm"
+                      style={{ backgroundColor: theme.colors.success }}
+                      title="Success"
+                    />
+                    <div
+                      className="h-10 rounded-md shadow-sm"
+                      style={{ backgroundColor: theme.colors.warning }}
+                      title="Warning"
+                    />
+                    <div
+                      className="h-10 rounded-md shadow-sm"
+                      style={{ backgroundColor: theme.colors.danger }}
+                      title="Danger"
                     />
                   </div>
 

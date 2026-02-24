@@ -10,11 +10,19 @@ import Tabs from "@/components/ui/Tabs";
 import MainLayout from "@/components/layout/MainLayout";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { storage, Consultation } from "@/lib/storage";
+<<<<<<< HEAD
 import { Loader2, FileText, MessageSquare, ClipboardList, RefreshCw } from "lucide-react";
 import StatusBadge from "@/components/ui/StatusBadge";
 import SOAPNote from "@/components/consultation/SOAPNote";
 import AnamneseSection from "@/components/consultation/AnamneseSection";
 import AddOrAdjustModal from "@/components/consultation/AddOrAdjustModal";
+=======
+import { Loader2, FileText, MessageSquare, ClipboardList, RefreshCw, Mic } from "lucide-react";
+import StatusBadge from "@/components/StatusBadge";
+import SOAPNote from "@/components/SOAPNote";
+import AnamneseSection from "@/components/AnamneseSection";
+import AddOrAdjustModal from "@/components/AddOrAdjustModal";
+>>>>>>> f0897c16606d72b0f5b567e3510608a3ca956414
 import { useLanguage } from "@/lib/LanguageContext";
 import { useTheme } from "@/lib/ThemeContext";
 import { useToast } from "@/lib/ToastContext";
@@ -887,24 +895,13 @@ export default function NewConsultationPage() {
           )}
 
           {step === "recording" && (
-            <div className="bg-theme-gray-bg rounded-lg shadow-sm border border-theme-border p-6">
-              <div className="flex flex-col items-center justify-center py-12">
-                <RecordingButton
-                  onRecordingComplete={handleRecordingComplete}
-                  onRecordingStart={handleRecordingStart}
-                  onReset={handleReset}
-                  disabled={isProcessing}
-                />
-                <p
-                  className={`mt-6 text-center max-w-md text-sm ${
-                    isDark
-                      ? "text-theme-text-secondary"
-                      : "text-theme-text-secondary"
-                  }`}>
-                  {t("consultation.startRecordingHint") ||
-                    "Yeni bir konsültasyon başlatmak için kayıt butonuna dokunun"}
-                </p>
-              </div>
+            <div className="bg-theme-card rounded-lg shadow-sm border border-theme-border overflow-hidden">
+              <RecordingButton
+                onRecordingComplete={handleRecordingComplete}
+                onRecordingStart={handleRecordingStart}
+                onReset={handleReset}
+                disabled={isProcessing}
+              />
             </div>
           )}
 
@@ -956,12 +953,12 @@ export default function NewConsultationPage() {
 
                 {activeTab === "note" && (
                   <div className="space-y-6">
-                    {/* Reanalyze Button */}
+                    {/* Reanalyze Button - PURPLE SECONDARY */}
                     <div className="flex justify-end">
                       <button
                         onClick={handleReanalyzeNote}
                         disabled={isReanalyzing}
-                        className="flex items-center gap-2 px-4 py-2 bg-theme-primary text-white rounded-lg hover:bg-theme-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        className="flex items-center gap-2 px-3.5 py-1.5 text-sm bg-theme-secondary text-white rounded-lg hover:bg-theme-secondary-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm">
                         {isReanalyzing ? (
                           <>
                             <Loader2 className="w-4 h-4 animate-spin" />

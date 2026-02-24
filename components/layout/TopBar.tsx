@@ -79,10 +79,10 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Calendar Button */}
+            {/* Calendar Button - PURPLE SECONDARY */}
             <button
               onClick={() => setShowCalendar(true)}
-              className="flex items-center gap-2 px-3 py-2 bg-theme-accent text-white rounded-lg hover:bg-theme-accent-light transition-colors shadow-sm"
+              className="flex items-center gap-2 px-3 py-1.5 text-sm bg-theme-secondary text-white rounded-lg hover:bg-theme-secondary-hover transition-colors shadow-sm"
               title={t("calendar.title") || "Kalender"}>
               <Calendar className="w-4 h-4" />
               <span className="hidden sm:inline">
@@ -107,10 +107,10 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
               </div>
             </div>
 
-            {/* Quick Voice Button */}
+            {/* Quick Voice Button - PURPLE SECONDARY */}
             <button
               onClick={() => setShowQuickVoice(true)}
-              className="flex items-center gap-2 px-3 py-2 bg-theme-accent text-white rounded-lg hover:bg-theme-accent-light transition-colors shadow-sm"
+              className="flex items-center gap-2 px-3 py-1.5 text-sm bg-theme-secondary text-white rounded-lg hover:bg-theme-secondary-hover transition-colors shadow-sm"
               title={t("quickVoice.title") || "Schnelle Spracherkennung"}>
               <Mic className="w-4 h-4" />
               <span className="hidden sm:inline">
@@ -120,7 +120,7 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
 
             <Link
               href="/new-consultation"
-              className="flex items-center gap-2 px-4 py-2 bg-theme-primary text-white rounded-lg hover:bg-theme-primary-dark transition-colors shadow-sm">
+              className="flex items-center gap-2 px-4 py-2.5 bg-theme-primary text-white rounded-lg hover:bg-theme-primary-hover transition-all shadow-sm hover:shadow-md font-medium">
               <Plus className="w-5 h-5" />
               <span className="hidden sm:inline">
                 {t("dashboard.newConsultation")}

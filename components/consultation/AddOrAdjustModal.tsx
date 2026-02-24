@@ -170,13 +170,13 @@ export default function AddOrAdjustModal({
                 <div className="flex gap-3">
                   <button
                     onClick={handleAdd}
-                    className="flex-1 px-4 py-2 bg-theme-accent text-white rounded-lg hover:bg-theme-accent/90 transition-colors"
+                    className="flex-1 px-4 py-2 bg-theme-secondary text-white rounded-lg hover:bg-theme-secondary-hover transition-colors shadow-sm"
                   >
                     {t('consultation.addToExisting')}
                   </button>
                   <button
                     onClick={handleReplace}
-                    className="flex-1 px-4 py-2 bg-theme-primary text-white rounded-lg hover:bg-theme-primary-dark transition-colors"
+                    className="flex-1 px-4 py-2.5 bg-theme-primary text-white rounded-lg hover:bg-theme-primary-hover transition-all shadow-sm hover:shadow-md font-medium"
                   >
                     {t('consultation.replaceExisting')}
                   </button>
@@ -186,7 +186,7 @@ export default function AddOrAdjustModal({
               {!currentText && (
                 <button
                   onClick={handleAdd}
-                  className="w-full px-4 py-2 bg-theme-accent text-white rounded-lg hover:bg-theme-accent/90 transition-colors"
+                  className="w-full px-4 py-2.5 bg-theme-primary text-white rounded-lg hover:bg-theme-primary-hover transition-all shadow-sm hover:shadow-md font-medium"
                 >
                   {t('consultation.add')}
                 </button>
@@ -194,7 +194,7 @@ export default function AddOrAdjustModal({
 
               <button
                 onClick={() => setStep('recording')}
-                className="w-full px-4 py-2 bg-theme-primary-light text-theme-text rounded-lg hover:bg-theme-primary-light/80 transition-colors"
+                className="w-full px-4 py-2 bg-theme-secondary-light text-theme-secondary border border-theme-secondary-light rounded-lg hover:bg-theme-secondary-light/80 transition-colors"
               >
                 {t('consultation.recordAgain')}
               </button>
